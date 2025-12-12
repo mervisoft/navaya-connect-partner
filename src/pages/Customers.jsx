@@ -47,6 +47,7 @@ export default function Customers() {
   };
 
   const filteredCustomers = customers
+    .filter(customer => customer && customer.id)
     .filter(customer => {
       const matchesSearch = 
         customer.company_name?.toLowerCase().includes(search.toLowerCase()) ||
