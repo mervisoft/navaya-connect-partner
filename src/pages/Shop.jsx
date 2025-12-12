@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
+import { useNavigate } from 'react-router-dom';
 import { 
   ShoppingCart, 
   Search, 
@@ -38,6 +39,7 @@ import {
 } from "@/components/ui/sheet";
 
 export default function Shop() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [cart, setCart] = useState([]);
@@ -112,9 +114,9 @@ export default function Shop() {
       return await base44.entities.Order.create(orderData);
     },
     onSuccess: () => {
-      toast.success('Bestellung erfolgreich erstellt!');
       setCart([]);
       setCartOpen(false);
+      navigate(createPageUrl('OrderConfirmation'));
     },
   });
 

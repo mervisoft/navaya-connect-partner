@@ -17,6 +17,7 @@ import CustomerView from './pages/CustomerView';
 import Customers from './pages/Customers';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
+import OrderConfirmation from './pages/OrderConfirmation';
 import __Layout from './Layout.jsx';
 
 
@@ -40,6 +41,7 @@ export const PAGES = {
     "Customers": Customers,
     "Contact": Contact,
     "FAQ": FAQ,
+    "OrderConfirmation": OrderConfirmation,
 }
 
 export const pagesConfig = {
