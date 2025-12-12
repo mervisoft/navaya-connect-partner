@@ -55,7 +55,22 @@ export default function CustomerView() {
   };
 
   if (!customerId) {
-    return <div className="p-8 text-center text-slate-600">Kein Kunde ausgewählt</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4">
+        <div className="w-20 h-20 rounded-3xl bg-slate-100 flex items-center justify-center mb-4">
+          <Building2 className="h-10 w-10 text-slate-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-slate-700 mb-1">Kein Kunde ausgewählt</h3>
+        <p className="text-slate-500 text-center max-w-sm mb-4">
+          Bitte wählen Sie einen Kunden aus der Kundenliste aus
+        </p>
+        <Button asChild>
+          <Link to={createPageUrl('Customers')}>
+            Zur Kundenliste
+          </Link>
+        </Button>
+      </div>
+    );
   }
 
   if (loadingCustomers || !customer) {
