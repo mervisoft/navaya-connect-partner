@@ -8,6 +8,7 @@ import Tickets from './pages/Tickets';
 import Contracts from './pages/Contracts';
 import Projects from './pages/Projects';
 import Documents from './pages/Documents';
+import Profile from './pages/Profile';
 import __Layout from './Layout.jsx';
 
 
@@ -22,6 +23,7 @@ export const PAGES = {
     "Contracts": Contracts,
     "Projects": Projects,
     "Documents": Documents,
+    "Profile": Profile,
 }
 
 export const pagesConfig = {

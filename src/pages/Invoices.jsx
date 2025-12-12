@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Receipt, Download, Search, Filter, AlertCircle } from 'lucide-react';
+import { Receipt, Download, Search, Filter, AlertCircle, Send, MessageSquare } from 'lucide-react';
 import { format, isPast } from 'date-fns';
 import { de } from 'date-fns/locale';
 import PageHeader from '@/components/shared/PageHeader';
@@ -9,6 +9,7 @@ import StatusBadge from '@/components/shared/StatusBadge';
 import EmptyState from '@/components/shared/EmptyState';
 import DataTable from '@/components/shared/DataTable';
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -28,11 +29,44 @@ export default function Invoices() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [newComment, setNewComment] = useState('');
+
+  const queryClient = useQueryClient();
 
   const { data: invoices = [], isLoading } = useQuery({
     queryKey: ['invoices'],
     queryFn: () => base44.entities.Invoice.list('-created_date'),
   });
+
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me(),
+  });
+
+  const addCommentMutation = useMutation({
+    mutationFn: async ({ invoiceId, comment }) => {
+      const invoice = invoices.find(i => i.id === invoiceId);
+      const updatedComments = [
+        ...(invoice.comments || []),
+        {
+          author: currentUser?.full_name || currentUser?.email || 'Kunde',
+          message: comment,
+          date: new Date().toISOString(),
+          is_customer_comment: true,
+        }
+      ];
+      return base44.entities.Invoice.update(invoiceId, { comments: updatedComments });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      setNewComment('');
+    },
+  });
+
+  const handleAddComment = () => {
+    if (!newComment.trim() || !selectedInvoice) return;
+    addCommentMutation.mutate({ invoiceId: selectedInvoice.id, comment: newComment });
+  };
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('de-DE', { 
@@ -246,6 +280,51 @@ export default function Invoices() {
                   </a>
                 </Button>
               )}
+
+              {/* Comments Section */}
+              <div className="border-t border-slate-100 pt-6">
+                <h4 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Kommentare
+                </h4>
+                <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
+                  {!selectedInvoice.comments || selectedInvoice.comments.length === 0 ? (
+                    <p className="text-slate-500 text-sm text-center py-4 bg-slate-50 rounded-lg">Noch keine Kommentare vorhanden</p>
+                  ) : (
+                    selectedInvoice.comments.map((comment, idx) => (
+                      <div key={idx} className="bg-slate-50 rounded-xl p-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="font-medium text-slate-700">{comment.author}</span>
+                          <span className="text-xs text-slate-400">
+                            {comment.date && format(new Date(comment.date), 'dd.MM.yy HH:mm', { locale: de })}
+                          </span>
+                        </div>
+                        <p className="text-slate-600 text-sm whitespace-pre-wrap">{comment.message}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-3 text-xs text-blue-800">
+                  Ihre Kommentare werden direkt an weclapp übermittelt und vom Buchhaltungsteam bearbeitet.
+                </div>
+
+                <div className="flex gap-2">
+                  <Textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Schreiben Sie hier Ihre Nachricht..."
+                    className="flex-1 min-h-[80px]"
+                  />
+                  <Button 
+                    onClick={handleAddComment}
+                    disabled={!newComment.trim() || addCommentMutation.isPending}
+                    className="self-end bg-[#1e3a5f] hover:bg-[#2d4a6f]"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </DialogContent>
