@@ -18,6 +18,7 @@ import Customers from './pages/Customers';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
 import OrderConfirmation from './pages/OrderConfirmation';
+import AIAssistant from './pages/AIAssistant';
 import __Layout from './Layout.jsx';
 
 
@@ -42,6 +43,7 @@ export const PAGES = {
     "Contact": Contact,
     "FAQ": FAQ,
     "OrderConfirmation": OrderConfirmation,
+    "AIAssistant": AIAssistant,
 }
 
 export const pagesConfig = {

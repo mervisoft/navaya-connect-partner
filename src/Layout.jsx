@@ -16,7 +16,8 @@ import {
   X,
   LogOut,
   User,
-  ChevronDown
+  ChevronDown,
+  Bot
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
@@ -139,6 +140,12 @@ export default function Layout({ children, currentPageName }) {
               </Link>
             </Button>
             <Button asChild variant="ghost" size="sm">
+              <Link to={createPageUrl('AIAssistant')}>
+                <Bot className="h-4 w-4 mr-2" />
+                KI-Assistent
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
               <Link to={createPageUrl('Contact')}>
                 Kontakt zu Mervisoft
               </Link>
@@ -191,6 +198,12 @@ export default function Layout({ children, currentPageName }) {
                   </Link>
                 </DropdownMenuItem>
               )}
+              <DropdownMenuItem asChild>
+                <Link to={createPageUrl('AIAssistant')}>
+                  <Bot className="h-4 w-4 mr-2" />
+                  KI-Assistent
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to={createPageUrl('Contact')}>
                   Kontakt zu Mervisoft
