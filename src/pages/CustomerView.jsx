@@ -15,29 +15,36 @@ export default function CustomerView() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setCustomerId(params.get('id'));
+    const id = params.get('id');
+    if (id) {
+      setCustomerId(id);
+    }
   }, []);
 
-  const { data: customer } = useQuery({
-    queryKey: ['customer', customerId],
+  const { data: customers = [], isLoading: loadingCustomers } = useQuery({
+    queryKey: ['customers'],
     queryFn: () => base44.entities.Customer.list(),
-    select: (data) => data.find(c => c.id === customerId),
     enabled: !!customerId,
   });
+
+  const customer = customers.find(c => c.id === customerId);
 
   const { data: quotes = [] } = useQuery({
     queryKey: ['quotes'],
     queryFn: () => base44.entities.Quote.list('-created_date', 5),
+    enabled: !!customerId,
   });
 
   const { data: orders = [] } = useQuery({
     queryKey: ['orders'],
     queryFn: () => base44.entities.Order.list('-created_date', 5),
+    enabled: !!customerId,
   });
 
   const { data: invoices = [] } = useQuery({
     queryKey: ['invoices'],
     queryFn: () => base44.entities.Invoice.list('-created_date', 5),
+    enabled: !!customerId,
   });
 
   const formatCurrency = (amount) => {
@@ -47,8 +54,12 @@ export default function CustomerView() {
     }).format(amount || 0);
   };
 
-  if (!customer) {
-    return <div>Laden...</div>;
+  if (!customerId) {
+    return <div className="p-8 text-center text-slate-600">Kein Kunde ausgewählt</div>;
+  }
+
+  if (loadingCustomers || !customer) {
+    return <div className="p-8 text-center text-slate-600">Laden...</div>;
   }
 
   return (
