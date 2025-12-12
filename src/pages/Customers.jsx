@@ -60,16 +60,21 @@ export default function Customers() {
 
   const getStatusColor = (status) => {
     const colors = {
-      aktiv: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      inaktiv: 'bg-slate-100 text-slate-600 border-slate-300',
-      potentiell: 'bg-blue-50 text-blue-700 border-blue-200'
+      'aktiv': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      'inaktiv': 'bg-slate-100 text-slate-600 border-slate-300',
+      'potentiell': 'bg-blue-50 text-blue-700 border-blue-200'
     };
-    return colors[status] || colors.aktiv;
+    return colors[String(status || 'aktiv')] || colors['aktiv'];
   };
 
   const getStatusLabel = (status) => {
-    if (!status || typeof status !== 'string') return 'Aktiv';
-    return status.charAt(0).toUpperCase() + status.slice(1);
+    try {
+      if (!status) return 'Aktiv';
+      const statusStr = String(status);
+      return statusStr.charAt(0).toUpperCase() + statusStr.slice(1);
+    } catch (e) {
+      return 'Aktiv';
+    }
   };
 
   const tableColumns = [
