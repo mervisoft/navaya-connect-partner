@@ -142,12 +142,16 @@ export default function Customers() {
     {
       label: 'Status',
       render: (customer) => {
-        if (!customer) return '-';
-        return (
-          <Badge variant="outline" className={getStatusColor(customer.status)}>
-            {getStatusLabel(customer.status)}
-          </Badge>
-        );
+        if (!customer) return <span>-</span>;
+        try {
+          return (
+            <Badge variant="outline" className={getStatusColor(customer.status)}>
+              {getStatusLabel(customer.status)}
+            </Badge>
+          );
+        } catch (e) {
+          return <span>Aktiv</span>;
+        }
       }
     }
   ];
