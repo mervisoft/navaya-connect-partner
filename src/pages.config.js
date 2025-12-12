@@ -14,6 +14,7 @@ import NewCustomer from './pages/NewCustomer';
 import RequestQuote from './pages/RequestQuote';
 import Shop from './pages/Shop';
 import CustomerView from './pages/CustomerView';
+import Customers from './pages/Customers';
 import __Layout from './Layout.jsx';
 
 
@@ -34,6 +35,7 @@ export const PAGES = {
     "RequestQuote": RequestQuote,
     "Shop": Shop,
     "CustomerView": CustomerView,
+    "Customers": Customers,
 }
 
 export const pagesConfig = {

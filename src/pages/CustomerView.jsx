@@ -53,17 +53,17 @@ export default function CustomerView() {
 
   return (
     <div className="space-y-6">
-      {/* Reseller Mode Banner */}
+      {/* Customer Mode Banner */}
       <Alert className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-        <User className="h-4 w-4 text-blue-600" />
+        <Building2 className="h-4 w-4 text-blue-600" />
         <AlertDescription className="flex items-center justify-between">
           <span className="text-blue-800">
-            Sie befinden sich im Dashboard von <strong>{customer.company_name}</strong>
+            Kundenansicht: <strong>{customer.company_name}</strong>
           </span>
           <Button asChild variant="outline" size="sm">
-            <Link to={createPageUrl('ResellerDashboard')}>
+            <Link to={createPageUrl('Customers')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Zurück zur Übersicht
+              Zurück zu Kunden
             </Link>
           </Button>
         </AlertDescription>

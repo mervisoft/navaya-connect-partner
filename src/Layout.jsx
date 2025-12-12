@@ -26,8 +26,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const navItems = [
-  { name: 'Reseller Dashboard', icon: LayoutDashboard, page: 'ResellerDashboard' },
+const resellerNavItems = [
+  { name: 'Dashboard', icon: LayoutDashboard, page: 'ResellerDashboard' },
+  { name: 'Kunden', icon: User, page: 'Customers' },
+];
+
+const customerNavItems = [
+  { name: 'Dashboard', icon: LayoutDashboard, page: 'CustomerView' },
   { name: 'Angebote', icon: FileText, page: 'Quotes' },
   { name: 'Aufträge', icon: ShoppingCart, page: 'Orders' },
   { name: 'Rechnungen', icon: Receipt, page: 'Invoices' },
@@ -41,6 +46,7 @@ const navItems = [
 export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [isCustomerView, setIsCustomerView] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -53,6 +59,14 @@ export default function Layout({ children, currentPageName }) {
     };
     loadUser();
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const customerId = params.get('id') || params.get('customerId');
+    setIsCustomerView(!!customerId || ['CustomerView', 'Shop', 'RequestQuote', 'Quotes', 'Orders', 'Invoices', 'Deliveries', 'Tickets', 'Contracts', 'Projects', 'Documents'].includes(currentPageName));
+  }, [currentPageName]);
+
+  const navItems = isCustomerView ? customerNavItems : resellerNavItems;
 
   const handleLogout = () => {
     base44.auth.logout();
