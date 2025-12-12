@@ -235,8 +235,8 @@ export default function Customers() {
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#2d4a6f] flex items-center justify-center shadow-lg shadow-slate-300/30">
                       <Building2 className="h-6 w-6 text-sky-300" />
                     </div>
-                    <Badge variant="outline" className={statusColors[customer?.status] || statusColors['aktiv']}>
-                     {customer?.status ? customer.status.charAt(0).toUpperCase() + customer.status.slice(1) : 'Aktiv'}
+                    <Badge variant="outline" className={getStatusColor(customer?.status)}>
+                     {getStatusLabel(customer?.status)}
                     </Badge>
                   </div>
 
