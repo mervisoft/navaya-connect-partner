@@ -75,57 +75,75 @@ export default function Customers() {
   const tableColumns = [
     {
       label: 'Firma',
-      render: (customer) => (
-        <div>
-          <div className="font-semibold text-slate-800">{customer.company_name || '-'}</div>
-          {customer.customer_number && (
-            <div className="text-xs text-slate-500 font-mono">{customer.customer_number}</div>
-          )}
-        </div>
-      )
+      render: (customer) => {
+        if (!customer) return '-';
+        return (
+          <div>
+            <div className="font-semibold text-slate-800">{customer.company_name || '-'}</div>
+            {customer.customer_number && (
+              <div className="text-xs text-slate-500 font-mono">{customer.customer_number}</div>
+            )}
+          </div>
+        );
+      }
     },
     {
       label: 'Ansprechpartner',
-      render: (customer) => customer.contact_person || '-'
+      render: (customer) => {
+        if (!customer) return '-';
+        return customer.contact_person || '-';
+      }
     },
     {
       label: 'Kontakt',
-      render: (customer) => (
-        <div className="space-y-1">
-          {customer.email && (
-            <div className="text-sm flex items-center gap-1">
-              <Mail className="h-3 w-3 text-slate-400" />
-              <span className="truncate max-w-[200px]">{customer.email}</span>
-            </div>
-          )}
-          {customer.phone && (
-            <div className="text-sm flex items-center gap-1">
-              <Phone className="h-3 w-3 text-slate-400" />
-              <span>{customer.phone}</span>
-            </div>
-          )}
-        </div>
-      )
+      render: (customer) => {
+        if (!customer) return '-';
+        return (
+          <div className="space-y-1">
+            {customer.email && (
+              <div className="text-sm flex items-center gap-1">
+                <Mail className="h-3 w-3 text-slate-400" />
+                <span className="truncate max-w-[200px]">{customer.email}</span>
+              </div>
+            )}
+            {customer.phone && (
+              <div className="text-sm flex items-center gap-1">
+                <Phone className="h-3 w-3 text-slate-400" />
+                <span>{customer.phone}</span>
+              </div>
+            )}
+          </div>
+        );
+      }
     },
     {
       label: 'Ort',
-      render: (customer) => customer.city || '-'
+      render: (customer) => {
+        if (!customer) return '-';
+        return customer.city || '-';
+      }
     },
     {
       label: 'Umsatz',
-      render: (customer) => (
-        <span className="font-semibold text-slate-800">
-          {formatCurrency(customer.total_revenue)}
-        </span>
-      )
+      render: (customer) => {
+        if (!customer) return '-';
+        return (
+          <span className="font-semibold text-slate-800">
+            {formatCurrency(customer.total_revenue)}
+          </span>
+        );
+      }
     },
     {
       label: 'Status',
-      render: (customer) => (
-        <Badge variant="outline" className={getStatusColor(customer?.status)}>
-          {getStatusLabel(customer?.status)}
-        </Badge>
-      )
+      render: (customer) => {
+        if (!customer) return '-';
+        return (
+          <Badge variant="outline" className={getStatusColor(customer.status)}>
+            {getStatusLabel(customer.status)}
+          </Badge>
+        );
+      }
     }
   ];
 
