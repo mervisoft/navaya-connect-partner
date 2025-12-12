@@ -59,22 +59,17 @@ export default function Customers() {
     .sort((a, b) => (a.company_name || '').localeCompare(b.company_name || ''));
 
   const getStatusColor = (status) => {
-    const colors = {
-      'aktiv': 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      'inaktiv': 'bg-slate-100 text-slate-600 border-slate-300',
-      'potentiell': 'bg-blue-50 text-blue-700 border-blue-200'
-    };
-    return colors[String(status || 'aktiv')] || colors['aktiv'];
+    if (!status || status === 'aktiv') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    if (status === 'inaktiv') return 'bg-slate-100 text-slate-600 border-slate-300';
+    if (status === 'potentiell') return 'bg-blue-50 text-blue-700 border-blue-200';
+    return 'bg-emerald-50 text-emerald-700 border-emerald-200';
   };
 
   const getStatusLabel = (status) => {
-    try {
-      if (!status) return 'Aktiv';
-      const statusStr = String(status);
-      return statusStr.charAt(0).toUpperCase() + statusStr.slice(1);
-    } catch (e) {
-      return 'Aktiv';
-    }
+    if (!status || status === 'aktiv') return 'Aktiv';
+    if (status === 'inaktiv') return 'Inaktiv';
+    if (status === 'potentiell') return 'Potentiell';
+    return 'Aktiv';
   };
 
   const tableColumns = [
