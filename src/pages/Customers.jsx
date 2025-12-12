@@ -262,9 +262,17 @@ export default function Customers() {
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#2d4a6f] flex items-center justify-center shadow-lg shadow-slate-300/30">
                       <Building2 className="h-6 w-6 text-sky-300" />
                     </div>
-                    <Badge variant="outline" className={getStatusColor(customer?.status)}>
-                     {getStatusLabel(customer?.status)}
-                    </Badge>
+                    {(() => {
+                      try {
+                        return (
+                          <Badge variant="outline" className={getStatusColor(customer?.status)}>
+                            {getStatusLabel(customer?.status)}
+                          </Badge>
+                        );
+                      } catch (e) {
+                        return <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">Aktiv</Badge>;
+                      }
+                    })()}
                   </div>
 
                   <h3 className="font-bold text-slate-800 text-lg mb-1 group-hover:text-[#1e3a5f] transition-colors">
