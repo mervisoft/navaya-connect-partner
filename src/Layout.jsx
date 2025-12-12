@@ -28,7 +28,6 @@ import {
 
 const navItems = [
   { name: 'Reseller Dashboard', icon: LayoutDashboard, page: 'ResellerDashboard' },
-  { name: 'Shop', icon: ShoppingCart, page: 'Shop' },
   { name: 'Angebote', icon: FileText, page: 'Quotes' },
   { name: 'Aufträge', icon: ShoppingCart, page: 'Orders' },
   { name: 'Rechnungen', icon: Receipt, page: 'Invoices' },

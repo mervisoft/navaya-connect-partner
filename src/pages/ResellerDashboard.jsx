@@ -107,26 +107,12 @@ export default function ResellerDashboard() {
         subtitle="Verwalten Sie Ihre Kunden und Bestellungen"
         icon={Building2}
         actions={
-          <div className="flex gap-3 flex-wrap">
-            <Button asChild className="bg-[#1e3a5f] hover:bg-[#2d4a6f]">
-              <Link to={createPageUrl('NewCustomer')}>
-                <Plus className="h-4 w-4 mr-2" />
-                Neuer Kunde
-              </Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to={createPageUrl('RequestQuote')}>
-                <FileText className="h-4 w-4 mr-2" />
-                Angebot anfragen
-              </Link>
-            </Button>
-            <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-              <Link to={createPageUrl('Shop')}>
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Shop
-              </Link>
-            </Button>
-          </div>
+          <Button asChild className="bg-[#1e3a5f] hover:bg-[#2d4a6f]">
+            <Link to={createPageUrl('NewCustomer')}>
+              <Plus className="h-4 w-4 mr-2" />
+              Neuer Kunde
+            </Link>
+          </Button>
         }
       />
 

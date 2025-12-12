@@ -9,8 +9,11 @@ import {
   Minus,
   Trash2,
   X,
-  Package
+  Package,
+  ArrowLeft
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import PageHeader from '@/components/shared/PageHeader';
@@ -38,6 +41,19 @@ export default function Shop() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [customerId, setCustomerId] = useState(null);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setCustomerId(params.get('customerId'));
+  }, []);
+
+  const { data: customer } = useQuery({
+    queryKey: ['customer', customerId],
+    queryFn: () => base44.entities.Customer.list(),
+    select: (data) => data.find(c => c.id === customerId),
+    enabled: !!customerId,
+  });
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products'],
@@ -98,9 +114,27 @@ export default function Shop() {
 
   return (
     <div className="space-y-6">
+      {/* Customer Context Banner */}
+      {customer && (
+        <Alert className="bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200">
+          <Package className="h-4 w-4 text-emerald-600" />
+          <AlertDescription className="flex items-center justify-between">
+            <span className="text-emerald-800">
+              Shop für <strong>{customer.company_name}</strong>
+            </span>
+            <Button asChild variant="outline" size="sm">
+              <Link to={createPageUrl(`CustomerView?id=${customerId}`)}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Zurück zum Kunden
+              </Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <PageHeader
         title="Shop"
-        subtitle="Produkte und Lizenzen für Ihre Kunden bestellen"
+        subtitle={customer ? `Produkte und Lizenzen für ${customer.company_name}` : "Produkte und Lizenzen für Ihre Kunden bestellen"}
         icon={Package}
         actions={
           <Sheet open={cartOpen} onOpenChange={setCartOpen}>

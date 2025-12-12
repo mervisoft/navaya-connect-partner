@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { FileText, Send, Plus, Trash2, ArrowLeft } from 'lucide-react';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from 'sonner';
 import PageHeader from '@/components/shared/PageHeader';
 import { Input } from "@/components/ui/input";
@@ -21,10 +22,27 @@ import { Link } from 'react-router-dom';
 export default function RequestQuote() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [customerId, setCustomerId] = useState(null);
   
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlCustomerId = params.get('customerId');
+    if (urlCustomerId) {
+      setCustomerId(urlCustomerId);
+      setFormData(prev => ({ ...prev, customer_id: urlCustomerId }));
+    }
+  }, []);
+
   const { data: customers = [] } = useQuery({
     queryKey: ['customers'],
     queryFn: () => base44.entities.Customer.list(),
+  });
+
+  const { data: customer } = useQuery({
+    queryKey: ['customer', customerId],
+    queryFn: () => base44.entities.Customer.list(),
+    select: (data) => data.find(c => c.id === customerId),
+    enabled: !!customerId,
   });
 
   const [formData, setFormData] = useState({
@@ -79,9 +97,27 @@ export default function RequestQuote() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {/* Customer Context Banner */}
+      {customer && (
+        <Alert className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <FileText className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="flex items-center justify-between">
+            <span className="text-blue-800">
+              Angebotsanfrage für <strong>{customer.company_name}</strong>
+            </span>
+            <Button asChild variant="outline" size="sm">
+              <Link to={createPageUrl(`CustomerView?id=${customerId}`)}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Zurück zum Kunden
+              </Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <PageHeader
         title="Angebot für Kunden anfragen"
-        subtitle="Fordern Sie ein individuelles Angebot für Ihren Kunden an"
+        subtitle={customer ? `Individuelles Angebot für ${customer.company_name}` : "Fordern Sie ein individuelles Angebot für Ihren Kunden an"}
         icon={FileText}
       />
 
@@ -101,6 +137,7 @@ export default function RequestQuote() {
                 required
                 value={formData.customer_id} 
                 onValueChange={(val) => handleChange('customer_id', val)}
+                disabled={!!customerId}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Bitte wählen Sie einen Kunden" />
@@ -113,6 +150,11 @@ export default function RequestQuote() {
                   ))}
                 </SelectContent>
               </Select>
+              {customerId && (
+                <p className="text-xs text-slate-500 mt-1">
+                  Kunde wurde automatisch ausgewählt
+                </p>
+              )}
             </div>
           </div>
 

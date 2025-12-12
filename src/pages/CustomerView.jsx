@@ -132,9 +132,31 @@ export default function CustomerView() {
         />
       </div>
 
+      {/* Primary Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Button asChild size="lg" className="h-auto py-6 bg-emerald-600 hover:bg-emerald-700">
+          <Link to={createPageUrl(`Shop?customerId=${customerId}`)}>
+            <ShoppingCart className="h-6 w-6 mr-3" />
+            <div className="text-left">
+              <div className="font-semibold">Shop für diesen Kunden</div>
+              <div className="text-xs opacity-90">Produkte und Lizenzen bestellen</div>
+            </div>
+          </Link>
+        </Button>
+        <Button asChild size="lg" className="h-auto py-6 bg-[#1e3a5f] hover:bg-[#2d4a6f]">
+          <Link to={createPageUrl(`RequestQuote?customerId=${customerId}`)}>
+            <FileText className="h-6 w-6 mr-3" />
+            <div className="text-left">
+              <div className="font-semibold">Angebot anfragen</div>
+              <div className="text-xs opacity-90">Individuelles Angebot erstellen</div>
+            </div>
+          </Link>
+        </Button>
+      </div>
+
       {/* Quick Links */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Button asChild className="h-auto py-6 flex-col gap-2">
+        <Button asChild className="h-auto py-6 flex-col gap-2" variant="outline">
           <Link to={createPageUrl('Quotes')}>
             <FileText className="h-6 w-6" />
             <span>Angebote</span>
