@@ -55,7 +55,7 @@ export default function Customers() {
       const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
       return matchesSearch && matchesStatus;
     })
-    .sort((a, b) => a.company_name?.localeCompare(b.company_name));
+    .sort((a, b) => (a.company_name || '').localeCompare(b.company_name || ''));
 
   const statusColors = {
     aktiv: 'bg-emerald-50 text-emerald-700 border-emerald-200',
