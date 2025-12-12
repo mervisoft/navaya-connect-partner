@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { FileText, Download, Search, Filter, Send, MessageSquare } from 'lucide-react';
+import { FileText, Download, Search, Filter, Send, MessageSquare, Check, Square, CheckSquare } from 'lucide-react';
+import { toast } from 'sonner';
+import { Checkbox } from "@/components/ui/checkbox";
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import PageHeader from '@/components/shared/PageHeader';
@@ -30,6 +32,7 @@ export default function Quotes() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedQuote, setSelectedQuote] = useState(null);
   const [newComment, setNewComment] = useState('');
+  const [selectedItems, setSelectedItems] = useState([]);
 
   const queryClient = useQueryClient();
 
@@ -66,6 +69,31 @@ export default function Quotes() {
   const handleAddComment = () => {
     if (!newComment.trim() || !selectedQuote) return;
     addCommentMutation.mutate({ quoteId: selectedQuote.id, comment: newComment });
+  };
+
+  const handleQuoteSelection = (quote) => {
+    setSelectedQuote(quote);
+    setSelectedItems(quote?.items?.map((_, idx) => idx) || []);
+  };
+
+  const toggleItem = (index) => {
+    setSelectedItems(prev => 
+      prev.includes(index) 
+        ? prev.filter(i => i !== index)
+        : [...prev, index]
+    );
+  };
+
+  const calculateSelectedTotal = () => {
+    if (!selectedQuote?.items) return 0;
+    return selectedQuote.items
+      .filter((_, idx) => selectedItems.includes(idx))
+      .reduce((sum, item) => sum + (item.total || 0), 0);
+  };
+
+  const handleAcceptQuote = () => {
+    toast.success('Angebot wurde erfolgreich angenommen! Wir werden uns in Kürze bei Ihnen melden.');
+    setSelectedQuote(null);
   };
 
   const formatCurrency = (amount) => {
@@ -165,7 +193,7 @@ export default function Quotes() {
           columns={columns}
           data={filteredQuotes}
           isLoading={isLoading}
-          onRowClick={setSelectedQuote}
+          onRowClick={handleQuoteSelection}
         />
       )}
 
@@ -214,11 +242,18 @@ export default function Quotes() {
 
               {selectedQuote.items?.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-slate-800 mb-3">Positionen</h4>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-slate-800">Positionen auswählen</h4>
+                    <span className="text-sm text-slate-500">
+                      {selectedItems.length} von {selectedQuote.items.length} ausgewählt
+                    </span>
+                  </div>
+                  
                   <div className="border border-slate-200 rounded-xl overflow-hidden">
                     <table className="w-full">
                       <thead className="bg-slate-50 text-xs text-slate-500 uppercase">
                         <tr>
+                          <th className="w-12 px-4 py-3"></th>
                           <th className="text-left px-4 py-3">Beschreibung</th>
                           <th className="text-right px-4 py-3">Menge</th>
                           <th className="text-right px-4 py-3">Einzelpreis</th>
@@ -227,16 +262,66 @@ export default function Quotes() {
                       </thead>
                       <tbody>
                         {selectedQuote.items.map((item, idx) => (
-                          <tr key={idx} className="border-t border-slate-100">
-                            <td className="px-4 py-3 text-slate-700">{item.description}</td>
-                            <td className="px-4 py-3 text-right text-slate-600">{item.quantity}</td>
-                            <td className="px-4 py-3 text-right text-slate-600">{formatCurrency(item.unit_price)}</td>
-                            <td className="px-4 py-3 text-right font-medium text-slate-800">{formatCurrency(item.total)}</td>
+                          <tr 
+                            key={idx} 
+                            className={`border-t border-slate-100 transition-colors ${
+                              selectedItems.includes(idx) ? 'bg-blue-50/50' : 'hover:bg-slate-50'
+                            }`}
+                          >
+                            <td className="px-4 py-3">
+                              <Checkbox
+                                checked={selectedItems.includes(idx)}
+                                onCheckedChange={() => toggleItem(idx)}
+                              />
+                            </td>
+                            <td className={`px-4 py-3 ${selectedItems.includes(idx) ? 'text-slate-700 font-medium' : 'text-slate-500'}`}>
+                              {item.description}
+                            </td>
+                            <td className={`px-4 py-3 text-right ${selectedItems.includes(idx) ? 'text-slate-600' : 'text-slate-400'}`}>
+                              {item.quantity}
+                            </td>
+                            <td className={`px-4 py-3 text-right ${selectedItems.includes(idx) ? 'text-slate-600' : 'text-slate-400'}`}>
+                              {formatCurrency(item.unit_price)}
+                            </td>
+                            <td className={`px-4 py-3 text-right ${selectedItems.includes(idx) ? 'font-medium text-slate-800' : 'text-slate-400'}`}>
+                              {formatCurrency(item.total)}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
+                      <tfoot className="bg-slate-50 border-t-2 border-slate-200">
+                        <tr>
+                          <td colSpan="4" className="px-4 py-3 text-right font-semibold text-slate-700">
+                            Ausgewählte Summe:
+                          </td>
+                          <td className="px-4 py-3 text-right font-bold text-slate-900 text-lg">
+                            {formatCurrency(calculateSelectedTotal())}
+                          </td>
+                        </tr>
+                      </tfoot>
                     </table>
                   </div>
+
+                  {selectedQuote.status === 'offen' && (
+                    <div className="mt-4 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold text-emerald-900 mb-1">Angebot annehmen</p>
+                          <p className="text-sm text-emerald-700">
+                            Sie akzeptieren {selectedItems.length} Position{selectedItems.length !== 1 ? 'en' : ''} im Gesamtwert von {formatCurrency(calculateSelectedTotal())}
+                          </p>
+                        </div>
+                        <Button 
+                          onClick={handleAcceptQuote}
+                          disabled={selectedItems.length === 0}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                          <Check className="h-4 w-4 mr-2" />
+                          Jetzt annehmen
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
