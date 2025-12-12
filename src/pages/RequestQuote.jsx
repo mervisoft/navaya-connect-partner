@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useNavigate, Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { FileText, Send, Plus, Trash2, ArrowLeft } from 'lucide-react';
+import { FileText, Send, Plus, Trash2, ArrowLeft, ShoppingCart, Package } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from 'sonner';
 import PageHeader from '@/components/shared/PageHeader';
@@ -48,17 +48,37 @@ export default function RequestQuote() {
     customer_id: '',
     title: '',
     notes: '',
-    items: [{ description: '', quantity: 1, notes: '' }],
+    items: [{ description: '', quantity: 1, unit_price: 0, notes: '' }],
+  });
+
+  const [showProductSelector, setShowProductSelector] = useState(false);
+  const [selectedItemIndex, setSelectedItemIndex] = useState(null);
+
+  const { data: products = [] } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => base44.entities.Product.list(),
   });
 
   const requestQuoteMutation = useMutation({
     mutationFn: async (data) => {
-      // Mockup: In Realität würde hier eine Anfrage an weclapp gehen
-      return Promise.resolve(data);
+      const quoteData = {
+        quote_number: `QT-${Date.now()}`,
+        title: data.title,
+        status: 'offen',
+        amount: 0,
+        valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        items: data.items,
+        notes: data.notes
+      };
+      return await base44.entities.Quote.create(quoteData);
     },
     onSuccess: () => {
-      toast.success('Angebotsanfrage erfolgreich versendet!');
-      navigate(createPageUrl('ResellerDashboard'));
+      toast.success('Angebotsanfrage erfolgreich erstellt!');
+      if (customerId) {
+        navigate(createPageUrl(`CustomerView?id=${customerId}`));
+      } else {
+        navigate(createPageUrl('ResellerDashboard'));
+      }
     },
   });
 
@@ -74,8 +94,25 @@ export default function RequestQuote() {
   const addItem = () => {
     setFormData(prev => ({
       ...prev,
-      items: [...prev.items, { description: '', quantity: 1, notes: '' }]
+      items: [...prev.items, { description: '', quantity: 1, unit_price: 0, notes: '' }]
     }));
+  };
+
+  const addProductToItem = (product, itemIndex) => {
+    setFormData(prev => ({
+      ...prev,
+      items: prev.items.map((item, i) => 
+        i === itemIndex 
+          ? { 
+              ...item, 
+              description: `${product.name} (${product.manufacturer})`,
+              unit_price: product.price,
+              total: product.price * item.quantity
+            } 
+          : item
+      )
+    }));
+    setShowProductSelector(false);
   };
 
   const removeItem = (index) => {
@@ -88,11 +125,25 @@ export default function RequestQuote() {
   const updateItem = (index, field, value) => {
     setFormData(prev => ({
       ...prev,
-      items: prev.items.map((item, i) => 
-        i === index ? { ...item, [field]: value } : item
-      )
+      items: prev.items.map((item, i) => {
+        if (i !== index) return item;
+        const updated = { ...item, [field]: value };
+        if (field === 'quantity' || field === 'unit_price') {
+          updated.total = (updated.quantity || 0) * (updated.unit_price || 0);
+        }
+        return updated;
+      })
     }));
   };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('de-DE', { 
+      style: 'currency', 
+      currency: 'EUR' 
+    }).format(amount || 0);
+  };
+
+  const totalAmount = formData.items.reduce((sum, item) => sum + (item.total || 0), 0);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -222,24 +273,56 @@ export default function RequestQuote() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                  <div className="md:col-span-3">
+                <div className="space-y-3">
+                  <div className="flex gap-2">
                     <Input
                       required
                       value={item.description}
                       onChange={(e) => updateItem(index, 'description', e.target.value)}
                       placeholder="Produktbeschreibung"
+                      className="flex-1"
                     />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedItemIndex(index);
+                        setShowProductSelector(true);
+                      }}
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <div>
-                    <Input
-                      type="number"
-                      min="1"
-                      required
-                      value={item.quantity}
-                      onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value))}
-                      placeholder="Menge"
-                    />
+                  
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-xs text-slate-600 mb-1 block">Menge</label>
+                      <Input
+                        type="number"
+                        min="1"
+                        required
+                        value={item.quantity}
+                        onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value))}
+                        placeholder="Menge"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-600 mb-1 block">Einzelpreis</label>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={item.unit_price}
+                        onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value))}
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-600 mb-1 block">Gesamt</label>
+                      <div className="h-10 flex items-center px-3 bg-slate-100 rounded-md font-semibold text-slate-700">
+                        {formatCurrency(item.total || 0)}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -253,6 +336,14 @@ export default function RequestQuote() {
             ))}
           </div>
 
+          {/* Total */}
+          {totalAmount > 0 && (
+            <div className="bg-slate-50 rounded-xl p-4 flex justify-between items-center">
+              <span className="text-lg font-semibold text-slate-700">Geschätzte Gesamtsumme:</span>
+              <span className="text-2xl font-bold text-slate-900">{formatCurrency(totalAmount)}</span>
+            </div>
+          )}
+
           {/* Buttons */}
           <div className="flex gap-3 pt-4 border-t border-slate-100">
             <Button
@@ -261,7 +352,7 @@ export default function RequestQuote() {
               asChild
               className="flex-1"
             >
-              <Link to={createPageUrl('ResellerDashboard')}>
+              <Link to={customerId ? createPageUrl(`CustomerView?id=${customerId}`) : createPageUrl('ResellerDashboard')}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Abbrechen
               </Link>
@@ -272,15 +363,61 @@ export default function RequestQuote() {
               className="flex-1 bg-[#1e3a5f] hover:bg-[#2d4a6f]"
             >
               <Send className="h-4 w-4 mr-2" />
-              {requestQuoteMutation.isPending ? 'Sendet...' : 'Angebot anfragen'}
+              {requestQuoteMutation.isPending ? 'Erstellt...' : 'Angebot anfragen'}
             </Button>
           </div>
         </form>
       </div>
 
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
-        <strong>Hinweis:</strong> Die Angebotsanfrage wird direkt an weclapp übermittelt und von unserem Vertriebsteam bearbeitet. Sie erhalten das fertige Angebot per E-Mail.
+        <strong>Hinweis:</strong> Die Angebotsanfrage wird als Entwurf gespeichert und kann bearbeitet werden.
       </div>
+
+      {/* Product Selector Dialog */}
+      {showProductSelector && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-slate-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-slate-800">Produkt auswählen</h3>
+                <Button variant="ghost" size="sm" onClick={() => setShowProductSelector(false)}>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Zurück
+                </Button>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {products.map(product => (
+                  <div 
+                    key={product.id}
+                    onClick={() => addProductToItem(product, selectedItemIndex)}
+                    className="bg-slate-50 rounded-xl p-4 hover:bg-slate-100 cursor-pointer transition-colors border-2 border-transparent hover:border-[#1e3a5f]"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-16 h-16 bg-slate-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                        {product.image_url ? (
+                          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover rounded-lg" />
+                        ) : (
+                          <Package className="h-8 w-8 text-slate-400" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-slate-800 mb-1">{product.name}</h4>
+                        <p className="text-xs text-slate-500 mb-2">{product.manufacturer}</p>
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-[#1e3a5f]">{formatCurrency(product.price)}</span>
+                          <span className="text-xs text-slate-500">{product.category}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

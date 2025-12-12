@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { 
@@ -107,10 +107,38 @@ export default function Shop() {
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
+  const createOrderMutation = useMutation({
+    mutationFn: async (orderData) => {
+      return await base44.entities.Order.create(orderData);
+    },
+    onSuccess: () => {
+      toast.success('Bestellung erfolgreich erstellt!');
+      setCart([]);
+      setCartOpen(false);
+    },
+  });
+
   const handleCheckout = () => {
-    toast.success('Bestellung wird verarbeitet...');
-    setCart([]);
-    setCartOpen(false);
+    if (!customerId) {
+      toast.error('Bitte wählen Sie einen Kunden aus');
+      return;
+    }
+
+    const orderData = {
+      order_number: `ORD-${Date.now()}`,
+      title: `Bestellung vom ${new Date().toLocaleDateString('de-DE')}`,
+      status: 'neu',
+      amount: cartTotal,
+      order_date: new Date().toISOString().split('T')[0],
+      items: cart.map(item => ({
+        description: `${item.name} (${item.manufacturer})`,
+        quantity: item.quantity,
+        unit_price: item.price,
+        total: item.price * item.quantity
+      }))
+    };
+
+    createOrderMutation.mutate(orderData);
   };
 
   return (
@@ -214,9 +242,15 @@ export default function Shop() {
                         className="w-full bg-emerald-600 hover:bg-emerald-700" 
                         size="lg"
                         onClick={handleCheckout}
+                        disabled={createOrderMutation.isPending || !customerId}
                       >
-                        Zur Kasse
+                        {createOrderMutation.isPending ? 'Bestellt...' : 'Bestellung abschließen'}
                       </Button>
+                      {!customerId && (
+                        <p className="text-xs text-red-600 text-center mt-2">
+                          Bitte wählen Sie zuerst einen Kunden aus
+                        </p>
+                      )}
                     </div>
                   </>
                 )}
