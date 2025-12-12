@@ -47,6 +47,7 @@ export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [isCustomerView, setIsCustomerView] = useState(false);
+  const [currentCustomer, setCurrentCustomer] = useState(null);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -63,7 +64,24 @@ export default function Layout({ children, currentPageName }) {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const customerId = params.get('id') || params.get('customerId');
-    setIsCustomerView(!!customerId || ['CustomerView', 'Shop', 'RequestQuote', 'Quotes', 'Orders', 'Invoices', 'Deliveries', 'Tickets', 'Contracts', 'Projects', 'Documents'].includes(currentPageName));
+    const inCustomerContext = !!customerId || ['CustomerView', 'Shop', 'RequestQuote', 'Quotes', 'Orders', 'Invoices', 'Deliveries', 'Tickets', 'Contracts', 'Projects', 'Documents'].includes(currentPageName);
+    setIsCustomerView(inCustomerContext);
+
+    // Load customer data if in customer view
+    if (customerId) {
+      const loadCustomer = async () => {
+        try {
+          const customers = await base44.entities.Customer.list();
+          const customer = customers.find(c => c.id === customerId);
+          setCurrentCustomer(customer);
+        } catch (e) {
+          console.log('Error loading customer');
+        }
+      };
+      loadCustomer();
+    } else {
+      setCurrentCustomer(null);
+    }
   }, [currentPageName]);
 
   const navItems = isCustomerView ? customerNavItems : resellerNavItems;
@@ -94,11 +112,18 @@ export default function Layout({ children, currentPageName }) {
           >
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1e3a5f] to-[#0ea5e9] flex items-center justify-center">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1e3a5f] to-[#0ea5e9] flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-sm">K</span>
             </div>
-            <span className="font-semibold text-slate-800">Kundenportal</span>
+            <div className="flex-1 min-w-0">
+              <span className="font-semibold text-slate-800 block truncate">
+                {currentCustomer ? currentCustomer.company_name : 'Kundenportal'}
+              </span>
+              {currentCustomer && (
+                <span className="text-xs text-slate-500">Kundenansicht</span>
+              )}
+            </div>
           </div>
           <div className="w-10" />
         </div>
@@ -119,9 +144,13 @@ export default function Layout({ children, currentPageName }) {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#0ea5e9] flex items-center justify-center shadow-lg shadow-sky-200/50">
                 <span className="text-white font-bold text-lg">K</span>
               </div>
-              <div>
-                <h1 className="font-bold text-slate-800 text-lg tracking-tight">Kundenportal</h1>
-                <p className="text-xs text-slate-400">Self-Service Center</p>
+              <div className="flex-1 min-w-0">
+                <h1 className="font-bold text-slate-800 text-lg tracking-tight">
+                  {currentCustomer ? 'Kundenansicht' : 'Kundenportal'}
+                </h1>
+                <p className="text-xs text-slate-400 truncate">
+                  {currentCustomer ? currentCustomer.company_name : 'Self-Service Center'}
+                </p>
               </div>
             </div>
           </div>
