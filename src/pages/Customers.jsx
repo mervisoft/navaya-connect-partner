@@ -58,10 +58,18 @@ export default function Customers() {
     })
     .sort((a, b) => (a.company_name || '').localeCompare(b.company_name || ''));
 
-  const statusColors = {
-    aktiv: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    inaktiv: 'bg-slate-100 text-slate-600 border-slate-300',
-    potentiell: 'bg-blue-50 text-blue-700 border-blue-200'
+  const getStatusColor = (status) => {
+    const colors = {
+      aktiv: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      inaktiv: 'bg-slate-100 text-slate-600 border-slate-300',
+      potentiell: 'bg-blue-50 text-blue-700 border-blue-200'
+    };
+    return colors[status] || colors.aktiv;
+  };
+
+  const getStatusLabel = (status) => {
+    if (!status || typeof status !== 'string') return 'Aktiv';
+    return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
   const tableColumns = [
