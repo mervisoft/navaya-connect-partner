@@ -15,9 +15,15 @@ export default function CustomerView() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
+    const urlCustomerId = params.get('id');
+    const storedCustomerId = localStorage.getItem('activeCustomerId');
+    const id = urlCustomerId || storedCustomerId;
+    
     if (id) {
       setCustomerId(id);
+      if (urlCustomerId) {
+        localStorage.setItem('activeCustomerId', urlCustomerId);
+      }
     }
   }, []);
 

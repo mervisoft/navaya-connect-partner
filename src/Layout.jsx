@@ -31,19 +31,22 @@ const resellerNavItems = [
   { name: 'Kunden', icon: User, page: 'Customers' },
 ];
 
-const customerNavItems = [
-  { name: 'Dashboard', icon: LayoutDashboard, page: 'CustomerView' },
-  { name: 'Shop', icon: ShoppingCart, page: 'Shop' },
-  { name: 'Angebot anfordern', icon: FileText, page: 'RequestQuote' },
-  { name: 'Angebote', icon: FileText, page: 'Quotes' },
-  { name: 'Aufträge', icon: ShoppingCart, page: 'Orders' },
-  { name: 'Rechnungen', icon: Receipt, page: 'Invoices' },
-  { name: 'Lieferscheine', icon: Truck, page: 'Deliveries' },
-  { name: 'Tickets', icon: TicketCheck, page: 'Tickets' },
-  { name: 'Verträge', icon: FileCheck, page: 'Contracts' },
-  { name: 'Projekte', icon: FolderKanban, page: 'Projects' },
-  { name: 'Dokumente', icon: Files, page: 'Documents' },
-];
+const getCustomerNavItems = () => {
+  const customerId = localStorage.getItem('activeCustomerId');
+  return [
+    { name: 'Dashboard', icon: LayoutDashboard, page: 'CustomerView', params: customerId ? `?id=${customerId}` : '' },
+    { name: 'Shop', icon: ShoppingCart, page: 'Shop', params: customerId ? `?customerId=${customerId}` : '' },
+    { name: 'Angebot anfordern', icon: FileText, page: 'RequestQuote', params: customerId ? `?customerId=${customerId}` : '' },
+    { name: 'Angebote', icon: FileText, page: 'Quotes', params: '' },
+    { name: 'Aufträge', icon: ShoppingCart, page: 'Orders', params: '' },
+    { name: 'Rechnungen', icon: Receipt, page: 'Invoices', params: '' },
+    { name: 'Lieferscheine', icon: Truck, page: 'Deliveries', params: '' },
+    { name: 'Tickets', icon: TicketCheck, page: 'Tickets', params: '' },
+    { name: 'Verträge', icon: FileCheck, page: 'Contracts', params: '' },
+    { name: 'Projekte', icon: FolderKanban, page: 'Projects', params: '' },
+    { name: 'Dokumente', icon: Files, page: 'Documents', params: '' },
+  ];
+};
 
 export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -66,15 +69,22 @@ export default function Layout({ children, currentPageName }) {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const customerId = params.get('id') || params.get('customerId');
-    const inCustomerContext = !!customerId || ['CustomerView', 'Shop', 'RequestQuote', 'Quotes', 'Orders', 'Invoices', 'Deliveries', 'Tickets', 'Contracts', 'Projects', 'Documents'].includes(currentPageName);
+    
+    // Load or retrieve customer ID from localStorage
+    if (customerId) {
+      localStorage.setItem('activeCustomerId', customerId);
+    }
+    
+    const activeCustomerId = customerId || localStorage.getItem('activeCustomerId');
+    const inCustomerContext = !!activeCustomerId || ['CustomerView', 'Shop', 'RequestQuote', 'Quotes', 'Orders', 'Invoices', 'Deliveries', 'Tickets', 'Contracts', 'Projects', 'Documents'].includes(currentPageName);
     setIsCustomerView(inCustomerContext);
 
     // Load customer data if in customer view
-    if (customerId) {
+    if (activeCustomerId) {
       const loadCustomer = async () => {
         try {
           const customers = await base44.entities.Customer.list();
-          const customer = customers.find(c => c.id === customerId);
+          const customer = customers.find(c => c.id === activeCustomerId);
           setCurrentCustomer(customer);
         } catch (e) {
           console.log('Error loading customer');
@@ -86,10 +96,15 @@ export default function Layout({ children, currentPageName }) {
     }
   }, [currentPageName]);
 
-  const navItems = isCustomerView ? customerNavItems : resellerNavItems;
+  const navItems = isCustomerView ? getCustomerNavItems() : resellerNavItems;
 
   const handleLogout = () => {
+    localStorage.removeItem('activeCustomerId');
     base44.auth.logout();
+  };
+
+  const handleBackToReseller = () => {
+    localStorage.removeItem('activeCustomerId');
   };
 
   return (
@@ -108,7 +123,7 @@ export default function Layout({ children, currentPageName }) {
         <div className="flex items-center justify-between px-8 h-16">
           <div className="flex items-center gap-6">
             {isCustomerView && currentCustomer && (
-              <Button asChild variant="outline" size="sm">
+              <Button asChild variant="outline" size="sm" onClick={handleBackToReseller}>
                 <Link to={createPageUrl('ResellerDashboard')}>
                   <LayoutDashboard className="h-4 w-4 mr-2" />
                   Zurück zum Reseller Dashboard
@@ -170,7 +185,7 @@ export default function Layout({ children, currentPageName }) {
             <DropdownMenuContent align="end">
               {isCustomerView && (
                 <DropdownMenuItem asChild>
-                  <Link to={createPageUrl('ResellerDashboard')}>
+                  <Link to={createPageUrl('ResellerDashboard')} onClick={handleBackToReseller}>
                     <LayoutDashboard className="h-4 w-4 mr-2" />
                     Zurück zum Reseller Dashboard
                   </Link>
@@ -222,10 +237,11 @@ export default function Layout({ children, currentPageName }) {
             <div className="space-y-1">
               {navItems.map((item) => {
                 const isActive = currentPageName === item.page;
+                const url = item.params ? `${item.page}${item.params}` : item.page;
                 return (
                   <Link
                     key={item.page}
-                    to={createPageUrl(item.page)}
+                    to={createPageUrl(url)}
                     onClick={() => setSidebarOpen(false)}
                     className={`
                       flex items-center gap-3 px-4 py-3 rounded-xl
