@@ -33,6 +33,8 @@ const resellerNavItems = [
 
 const customerNavItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'CustomerView' },
+  { name: 'Shop', icon: ShoppingCart, page: 'Shop' },
+  { name: 'Angebot anfordern', icon: FileText, page: 'RequestQuote' },
   { name: 'Angebote', icon: FileText, page: 'Quotes' },
   { name: 'Aufträge', icon: ShoppingCart, page: 'Orders' },
   { name: 'Rechnungen', icon: Receipt, page: 'Invoices' },
