@@ -27,7 +27,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const navItems = [
-  { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
+  { name: 'Reseller Dashboard', icon: LayoutDashboard, page: 'ResellerDashboard' },
+  { name: 'Shop', icon: ShoppingCart, page: 'Shop' },
   { name: 'Angebote', icon: FileText, page: 'Quotes' },
   { name: 'Aufträge', icon: ShoppingCart, page: 'Orders' },
   { name: 'Rechnungen', icon: Receipt, page: 'Invoices' },
