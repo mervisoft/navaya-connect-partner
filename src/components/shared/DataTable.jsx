@@ -46,30 +46,33 @@ export default function DataTable({ columns, data, onRowClick, isLoading }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((row, index) => (
-            <motion.tr
-              key={row.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.03 }}
-              onClick={() => onRowClick?.(row)}
-              className={`
-                border-slate-50 hover:bg-sky-50/50 transition-colors
-                ${onRowClick ? 'cursor-pointer' : ''}
-              `}
-            >
-              {columns.map((col) => (
-                <TableCell key={col.key} className={`py-4 ${col.cellClassName || ''}`}>
-                  {col.render ? col.render(row[col.key], row) : row[col.key]}
-                </TableCell>
-              ))}
-              {onRowClick && (
-                <TableCell className="py-4">
-                  <ChevronRight className="h-4 w-4 text-slate-400" />
-                </TableCell>
-              )}
-            </motion.tr>
-          ))}
+          {data.map((row, index) => {
+            if (!row) return null;
+            return (
+              <motion.tr
+                key={row.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.03 }}
+                onClick={() => onRowClick?.(row)}
+                className={`
+                  border-slate-50 hover:bg-sky-50/50 transition-colors
+                  ${onRowClick ? 'cursor-pointer' : ''}
+                `}
+              >
+                {columns.map((col) => (
+                  <TableCell key={col.key || col.label} className={`py-4 ${col.cellClassName || ''}`}>
+                    {col.render ? col.render(row) : (col.key ? row[col.key] : '')}
+                  </TableCell>
+                ))}
+                {onRowClick && (
+                  <TableCell className="py-4">
+                    <ChevronRight className="h-4 w-4 text-slate-400" />
+                  </TableCell>
+                )}
+              </motion.tr>
+            );
+          })}
         </TableBody>
       </Table>
     </div>
