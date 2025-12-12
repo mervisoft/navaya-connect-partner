@@ -122,8 +122,8 @@ export default function Customers() {
     {
       label: 'Status',
       render: (customer) => (
-        <Badge variant="outline" className={statusColors[customer?.status] || statusColors['aktiv']}>
-          {customer?.status ? customer.status.charAt(0).toUpperCase() + customer.status.slice(1) : 'Aktiv'}
+        <Badge variant="outline" className={getStatusColor(customer?.status)}>
+          {getStatusLabel(customer?.status)}
         </Badge>
       )
     }
