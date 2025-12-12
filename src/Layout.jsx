@@ -86,9 +86,15 @@ export default function Layout({ children, currentPageName }) {
         try {
           const customers = await base44.entities.Customer.list();
           const customer = customers.find(c => c.id === activeCustomerId);
-          setCurrentCustomer(customer);
+          if (customer) {
+            setCurrentCustomer(customer);
+          } else {
+            setCurrentCustomer(null);
+            localStorage.removeItem('activeCustomerId');
+          }
         } catch (e) {
           console.log('Error loading customer');
+          setCurrentCustomer(null);
         }
       };
       loadCustomer();
