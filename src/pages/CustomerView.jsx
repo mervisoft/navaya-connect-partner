@@ -3,15 +3,20 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft, Building2, FileText, ShoppingCart, Receipt, User } from 'lucide-react';
+import { ArrowLeft, Building2, FileText, ShoppingCart, Receipt, User, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import PageHeader from '@/components/shared/PageHeader';
 import StatCard from '@/components/dashboard/StatCard';
+import ActivityTimeline from '@/components/customer/ActivityTimeline';
+import ActivityDetailDialog from '@/components/customer/ActivityDetailDialog';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function CustomerView() {
   const [customerId, setCustomerId] = useState(null);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -52,6 +57,70 @@ export default function CustomerView() {
     queryFn: () => base44.entities.Invoice.list('-created_date', 5),
     enabled: !!customerId,
   });
+
+  const { data: tickets = [] } = useQuery({
+    queryKey: ['tickets'],
+    queryFn: () => base44.entities.Ticket.list('-created_date', 10),
+    enabled: !!customerId,
+  });
+
+  const { data: contracts = [] } = useQuery({
+    queryKey: ['contracts'],
+    queryFn: () => base44.entities.Contract.list('-created_date', 10),
+    enabled: !!customerId,
+  });
+
+  // Combine all activities into a timeline
+  const allActivities = React.useMemo(() => {
+    const activities = [];
+
+    quotes.forEach(quote => {
+      activities.push({
+        type: 'quote',
+        date: quote.created_date,
+        data: quote
+      });
+    });
+
+    orders.forEach(order => {
+      activities.push({
+        type: 'order',
+        date: order.created_date,
+        data: order
+      });
+    });
+
+    invoices.forEach(invoice => {
+      activities.push({
+        type: 'invoice',
+        date: invoice.created_date,
+        data: invoice
+      });
+    });
+
+    tickets.forEach(ticket => {
+      activities.push({
+        type: 'ticket',
+        date: ticket.created_date,
+        data: ticket
+      });
+    });
+
+    contracts.forEach(contract => {
+      activities.push({
+        type: 'contract',
+        date: contract.created_date,
+        data: contract
+      });
+    });
+
+    return activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }, [quotes, orders, invoices, tickets, contracts]);
+
+  const handleViewDetails = (activity) => {
+    setSelectedActivity(activity);
+    setDialogOpen(true);
+  };
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('de-DE', { 
@@ -213,6 +282,73 @@ export default function CustomerView() {
           </Link>
         </Button>
       </div>
-    </div>
-  );
-}
+
+      {/* Activity Timeline */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="border-b border-slate-200 p-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#2d4a6f] flex items-center justify-center">
+              <Clock className="h-5 w-5 text-sky-300" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-slate-800">Aktivitäts-Historie</h2>
+              <p className="text-sm text-slate-500">Alle Interaktionen und Transaktionen im Überblick</p>
+            </div>
+          </div>
+        </div>
+
+        <Tabs defaultValue="all" className="w-full">
+          <div className="border-b border-slate-200 px-6">
+            <TabsList className="bg-transparent">
+              <TabsTrigger value="all">Alle ({allActivities.length})</TabsTrigger>
+              <TabsTrigger value="quotes">Angebote ({quotes.length})</TabsTrigger>
+              <TabsTrigger value="orders">Aufträge ({orders.length})</TabsTrigger>
+              <TabsTrigger value="invoices">Rechnungen ({invoices.length})</TabsTrigger>
+              <TabsTrigger value="tickets">Tickets ({tickets.length})</TabsTrigger>
+            </TabsList>
+          </div>
+
+          <div className="p-6">
+            <TabsContent value="all">
+              <ActivityTimeline 
+                activities={allActivities} 
+                onViewDetails={handleViewDetails}
+              />
+            </TabsContent>
+            <TabsContent value="quotes">
+              <ActivityTimeline 
+                activities={allActivities.filter(a => a.type === 'quote')} 
+                onViewDetails={handleViewDetails}
+              />
+            </TabsContent>
+            <TabsContent value="orders">
+              <ActivityTimeline 
+                activities={allActivities.filter(a => a.type === 'order')} 
+                onViewDetails={handleViewDetails}
+              />
+            </TabsContent>
+            <TabsContent value="invoices">
+              <ActivityTimeline 
+                activities={allActivities.filter(a => a.type === 'invoice')} 
+                onViewDetails={handleViewDetails}
+              />
+            </TabsContent>
+            <TabsContent value="tickets">
+              <ActivityTimeline 
+                activities={allActivities.filter(a => a.type === 'ticket')} 
+                onViewDetails={handleViewDetails}
+              />
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
+
+      {/* Activity Detail Dialog */}
+      <ActivityDetailDialog
+        activity={selectedActivity}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
+      </div>
+      );
+      }
