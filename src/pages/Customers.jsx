@@ -10,7 +10,9 @@ import {
   Building2,
   Mail,
   Phone,
-  MapPin
+  MapPin,
+  LayoutGrid,
+  Table
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import PageHeader from '@/components/shared/PageHeader';
@@ -25,10 +27,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import DataTable from '@/components/shared/DataTable';
 
 export default function Customers() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [viewMode, setViewMode] = useState('grid');
 
   const { data: customers = [], isLoading } = useQuery({
     queryKey: ['customers'],
@@ -42,20 +46,79 @@ export default function Customers() {
     }).format(amount || 0);
   };
 
-  const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = 
-      customer.company_name?.toLowerCase().includes(search.toLowerCase()) ||
-      customer.contact_person?.toLowerCase().includes(search.toLowerCase()) ||
-      customer.email?.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredCustomers = customers
+    .filter(customer => {
+      const matchesSearch = 
+        customer.company_name?.toLowerCase().includes(search.toLowerCase()) ||
+        customer.contact_person?.toLowerCase().includes(search.toLowerCase()) ||
+        customer.email?.toLowerCase().includes(search.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => a.company_name?.localeCompare(b.company_name));
 
   const statusColors = {
     aktiv: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     inaktiv: 'bg-slate-100 text-slate-600 border-slate-300',
     potentiell: 'bg-blue-50 text-blue-700 border-blue-200'
   };
+
+  const tableColumns = [
+    {
+      label: 'Firma',
+      render: (customer) => (
+        <div>
+          <div className="font-semibold text-slate-800">{customer.company_name}</div>
+          {customer.customer_number && (
+            <div className="text-xs text-slate-500 font-mono">{customer.customer_number}</div>
+          )}
+        </div>
+      )
+    },
+    {
+      label: 'Ansprechpartner',
+      render: (customer) => customer.contact_person || '-'
+    },
+    {
+      label: 'Kontakt',
+      render: (customer) => (
+        <div className="space-y-1">
+          {customer.email && (
+            <div className="text-sm flex items-center gap-1">
+              <Mail className="h-3 w-3 text-slate-400" />
+              <span className="truncate max-w-[200px]">{customer.email}</span>
+            </div>
+          )}
+          {customer.phone && (
+            <div className="text-sm flex items-center gap-1">
+              <Phone className="h-3 w-3 text-slate-400" />
+              <span>{customer.phone}</span>
+            </div>
+          )}
+        </div>
+      )
+    },
+    {
+      label: 'Ort',
+      render: (customer) => customer.city || '-'
+    },
+    {
+      label: 'Umsatz',
+      render: (customer) => (
+        <span className="font-semibold text-slate-800">
+          {formatCurrency(customer.total_revenue)}
+        </span>
+      )
+    },
+    {
+      label: 'Status',
+      render: (customer) => (
+        <Badge variant="outline" className={statusColors[customer.status]}>
+          {customer.status?.charAt(0).toUpperCase() + customer.status?.slice(1)}
+        </Badge>
+      )
+    }
+  ];
 
   return (
     <div className="space-y-6">
@@ -73,7 +136,7 @@ export default function Customers() {
         }
       />
 
-      {/* Filters */}
+      {/* Filters and View Toggle */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -95,27 +158,59 @@ export default function Customers() {
             <SelectItem value="potentiell">Potentiell</SelectItem>
           </SelectContent>
         </Select>
+        <div className="flex gap-2">
+          <Button
+            variant={viewMode === 'grid' ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => setViewMode('grid')}
+            className={viewMode === 'grid' ? 'bg-[#1e3a5f] hover:bg-[#2d4a6f]' : ''}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={viewMode === 'table' ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => setViewMode('table')}
+            className={viewMode === 'table' ? 'bg-[#1e3a5f] hover:bg-[#2d4a6f]' : ''}
+          >
+            <Table className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
-      {/* Customer Cards */}
+      {/* Customer Display */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-slate-200 p-6 animate-pulse">
-              <div className="h-6 bg-slate-200 rounded w-3/4 mb-4" />
-              <div className="space-y-2">
-                <div className="h-4 bg-slate-200 rounded w-full" />
-                <div className="h-4 bg-slate-200 rounded w-2/3" />
+        viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl border border-slate-200 p-6 animate-pulse">
+                <div className="h-6 bg-slate-200 rounded w-3/4 mb-4" />
+                <div className="space-y-2">
+                  <div className="h-4 bg-slate-200 rounded w-full" />
+                  <div className="h-4 bg-slate-200 rounded w-2/3" />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl border border-slate-200">
+            <DataTable columns={tableColumns} data={[]} isLoading={true} />
+          </div>
+        )
       ) : filteredCustomers.length === 0 ? (
         <EmptyState
           icon={Users}
           title="Keine Kunden gefunden"
           description="Erstellen Sie Ihren ersten Kunden oder passen Sie Ihre Suchkriterien an"
         />
+      ) : viewMode === 'table' ? (
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <DataTable 
+            columns={tableColumns} 
+            data={filteredCustomers}
+            onRowClick={(customer) => window.location.href = createPageUrl(`CustomerView?id=${customer.id}`)}
+          />
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCustomers.map((customer, index) => (
