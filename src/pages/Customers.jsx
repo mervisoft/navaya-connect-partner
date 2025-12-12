@@ -66,22 +66,22 @@ export default function Customers() {
   const tableColumns = [
     {
       label: 'Firma',
-      render: (customer) => (
+      render: (customer) => customer ? (
         <div>
-          <div className="font-semibold text-slate-800">{customer.company_name}</div>
+          <div className="font-semibold text-slate-800">{customer.company_name || '-'}</div>
           {customer.customer_number && (
             <div className="text-xs text-slate-500 font-mono">{customer.customer_number}</div>
           )}
         </div>
-      )
+      ) : '-'
     },
     {
       label: 'Ansprechpartner',
-      render: (customer) => customer.contact_person || '-'
+      render: (customer) => customer?.contact_person || '-'
     },
     {
       label: 'Kontakt',
-      render: (customer) => (
+      render: (customer) => customer ? (
         <div className="space-y-1">
           {customer.email && (
             <div className="text-sm flex items-center gap-1">
@@ -96,27 +96,27 @@ export default function Customers() {
             </div>
           )}
         </div>
-      )
+      ) : '-'
     },
     {
       label: 'Ort',
-      render: (customer) => customer.city || '-'
+      render: (customer) => customer?.city || '-'
     },
     {
       label: 'Umsatz',
-      render: (customer) => (
+      render: (customer) => customer ? (
         <span className="font-semibold text-slate-800">
           {formatCurrency(customer.total_revenue)}
         </span>
-      )
+      ) : '-'
     },
     {
       label: 'Status',
-      render: (customer) => (
+      render: (customer) => customer ? (
         <Badge variant="outline" className={statusColors[customer.status]}>
           {customer.status?.charAt(0).toUpperCase() + customer.status?.slice(1)}
         </Badge>
-      )
+      ) : '-'
     }
   ];
 
