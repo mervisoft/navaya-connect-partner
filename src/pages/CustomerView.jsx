@@ -9,9 +9,11 @@ import PageHeader from '@/components/shared/PageHeader';
 import StatCard from '@/components/dashboard/StatCard';
 import ActivityTimeline from '@/components/customer/ActivityTimeline';
 import ActivityDetailDialog from '@/components/customer/ActivityDetailDialog';
+import SalesChart from '@/components/customer/SalesChart';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TrendingUp, BarChart3, PieChart } from 'lucide-react';
 
 export default function CustomerView() {
   const [customerId, setCustomerId] = useState(null);
@@ -54,7 +56,13 @@ export default function CustomerView() {
 
   const { data: invoices = [] } = useQuery({
     queryKey: ['invoices'],
-    queryFn: () => base44.entities.Invoice.list('-created_date', 5),
+    queryFn: () => base44.entities.Invoice.list('-created_date'),
+    enabled: !!customerId,
+  });
+
+  const { data: allOrders = [] } = useQuery({
+    queryKey: ['allOrders'],
+    queryFn: () => base44.entities.Order.list('-created_date'),
     enabled: !!customerId,
   });
 
@@ -128,6 +136,72 @@ export default function CustomerView() {
       currency: 'EUR' 
     }).format(amount || 0);
   };
+
+  // Process sales data for charts
+  const salesData = React.useMemo(() => {
+    const monthlyData = {};
+    const categoryData = {};
+    
+    // Process invoices for monthly revenue
+    [...invoices, ...allOrders].forEach(item => {
+      if (!item.created_date || !item.amount) return;
+      
+      const date = new Date(item.created_date);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const monthLabel = date.toLocaleDateString('de-DE', { month: 'short', year: 'numeric' });
+      
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = { label: monthLabel, invoices: 0, orders: 0 };
+      }
+      
+      if (item.invoice_number) {
+        monthlyData[monthKey].invoices += item.amount;
+      } else if (item.order_number) {
+        monthlyData[monthKey].orders += item.amount;
+      }
+    });
+
+    // Process orders by status
+    allOrders.forEach(order => {
+      const status = order.status || 'unbekannt';
+      categoryData[status] = (categoryData[status] || 0) + (order.amount || 0);
+    });
+
+    const sortedMonths = Object.keys(monthlyData).sort();
+    const last6Months = sortedMonths.slice(-6);
+
+    return {
+      monthly: {
+        labels: last6Months.map(key => monthlyData[key].label),
+        datasets: [
+          {
+            label: 'Rechnungen',
+            data: last6Months.map(key => monthlyData[key].invoices)
+          },
+          {
+            label: 'Aufträge',
+            data: last6Months.map(key => monthlyData[key].orders)
+          }
+        ]
+      },
+      byStatus: {
+        labels: Object.keys(categoryData).map(status => {
+          const labels = {
+            neu: 'Neu',
+            in_bearbeitung: 'In Bearbeitung',
+            versendet: 'Versendet',
+            abgeschlossen: 'Abgeschlossen',
+            storniert: 'Storniert'
+          };
+          return labels[status] || status;
+        }),
+        datasets: [{
+          label: 'Umsatz nach Status',
+          data: Object.values(categoryData)
+        }]
+      }
+    };
+  }, [invoices, allOrders]);
 
   if (!customerId) {
     return (
@@ -213,24 +287,73 @@ export default function CustomerView() {
         <StatCard
           title="Angebote"
           value={quotes.length}
-          subtitle="Letzte 5 Angebote"
+          subtitle="Gesamt"
           icon={FileText}
           color="blue"
         />
         <StatCard
           title="Aufträge"
-          value={orders.length}
-          subtitle="Letzte 5 Aufträge"
+          value={allOrders.length}
+          subtitle="Gesamt"
           icon={ShoppingCart}
           color="purple"
         />
         <StatCard
           title="Rechnungen"
           value={invoices.length}
-          subtitle="Letzte 5 Rechnungen"
+          subtitle="Gesamt"
           icon={Receipt}
           color="orange"
         />
+      </div>
+
+      {/* Sales Analytics Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-sky-400 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-800">Umsatzentwicklung</h3>
+              <p className="text-sm text-slate-500">Letzte 6 Monate</p>
+            </div>
+          </div>
+          <div className="h-80">
+            <SalesChart data={salesData.monthly} type="line" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-slate-200 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-400 flex items-center justify-center">
+              <PieChart className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-800">Nach Status</h3>
+              <p className="text-sm text-slate-500">Auftragsverteilung</p>
+            </div>
+          </div>
+          <div className="h-80">
+            <SalesChart data={salesData.byStatus} type="doughnut" />
+          </div>
+        </div>
+      </div>
+
+      {/* Monthly Comparison Bar Chart */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center">
+            <BarChart3 className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-slate-800">Vergleich: Rechnungen vs. Aufträge</h3>
+            <p className="text-sm text-slate-500">Monatlicher Umsatzvergleich</p>
+          </div>
+        </div>
+        <div className="h-80">
+          <SalesChart data={salesData.monthly} type="bar" />
+        </div>
       </div>
 
       {/* Primary Actions */}
