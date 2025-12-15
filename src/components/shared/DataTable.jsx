@@ -62,7 +62,7 @@ export default function DataTable({ columns, data, onRowClick, isLoading }) {
               >
                 {columns.map((col) => (
                   <TableCell key={col.key || col.label} className={`py-4 ${col.cellClassName || ''}`}>
-                    {col.render ? col.render(row) : (col.key ? row[col.key] : '')}
+                    {col.render ? col.render(row[col.key], row) : (col.key ? row[col.key] : '')}
                   </TableCell>
                 ))}
                 {onRowClick && (
