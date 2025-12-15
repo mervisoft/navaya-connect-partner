@@ -48,7 +48,7 @@ export default function RequestQuote() {
     customer_id: '',
     title: '',
     notes: '',
-    items: [{ description: '', quantity: 1, unit_price: 0, notes: '' }],
+    items: [],
   });
 
   const [showProductSelector, setShowProductSelector] = useState(false);
@@ -92,26 +92,36 @@ export default function RequestQuote() {
   };
 
   const addItem = () => {
-    setFormData(prev => ({
-      ...prev,
-      items: [...prev.items, { description: '', quantity: 1, unit_price: 0, notes: '' }]
-    }));
+    setSelectedItemIndex(formData.items.length);
+    setShowProductSelector(true);
   };
 
   const addProductToItem = (product, itemIndex) => {
-    setFormData(prev => ({
-      ...prev,
-      items: prev.items.map((item, i) => 
-        i === itemIndex 
-          ? { 
-              ...item, 
-              description: `${product.name} (${product.manufacturer})`,
-              unit_price: product.price,
-              total: product.price * item.quantity
-            } 
-          : item
-      )
-    }));
+    const newItem = {
+      description: `${product.name} (${product.manufacturer})`,
+      quantity: 1,
+      unit_price: product.price,
+      total: product.price,
+      notes: ''
+    };
+
+    setFormData(prev => {
+      if (itemIndex >= prev.items.length) {
+        // Add new item
+        return {
+          ...prev,
+          items: [...prev.items, newItem]
+        };
+      } else {
+        // Update existing item
+        return {
+          ...prev,
+          items: prev.items.map((item, i) => 
+            i === itemIndex ? newItem : item
+          )
+        };
+      }
+    });
     setShowProductSelector(false);
   };
 
@@ -247,7 +257,7 @@ export default function RequestQuote() {
               </h3>
               <Button
                 type="button"
-                variant="outline"
+                className="bg-emerald-600 hover:bg-emerald-700"
                 size="sm"
                 onClick={addItem}
               >
@@ -256,21 +266,34 @@ export default function RequestQuote() {
               </Button>
             </div>
             
+            {formData.items.length === 0 && (
+              <div className="text-center py-12 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                <Package className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-500 mb-4">Noch keine Positionen hinzugefügt</p>
+                <Button
+                  type="button"
+                  className="bg-emerald-600 hover:bg-emerald-700"
+                  onClick={addItem}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Erste Position hinzufügen
+                </Button>
+              </div>
+            )}
+            
             {formData.items.map((item, index) => (
               <div key={index} className="bg-slate-50 rounded-xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-slate-700">Position {index + 1}</span>
-                  {formData.items.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeItem(index)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeItem(index)}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
 
                 <div className="space-y-3">
