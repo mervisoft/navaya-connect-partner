@@ -91,9 +91,14 @@ export default function ResellerDashboard() {
           inaktiv: 'bg-slate-100 text-slate-600',
           potentiell: 'bg-blue-50 text-blue-700'
         };
+        const labels = {
+          aktiv: 'Aktiv',
+          inaktiv: 'Inaktiv',
+          potentiell: 'Potentiell'
+        };
         return (
-          <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${colors[val] || colors.aktiv}`}>
-            {val?.charAt(0).toUpperCase() + val?.slice(1)}
+          <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${colors[val || 'aktiv'] || colors.aktiv}`}>
+            {labels[val] || 'Aktiv'}
           </span>
         );
       }

@@ -1,49 +1,49 @@
-import Home from './pages/Home';
+import AIAssistant from './pages/AIAssistant';
+import Contact from './pages/Contact';
 import Contracts from './pages/Contracts';
+import CustomerView from './pages/CustomerView';
+import Customers from './pages/Customers';
 import Dashboard from './pages/Dashboard';
 import Deliveries from './pages/Deliveries';
 import Documents from './pages/Documents';
+import FAQ from './pages/FAQ';
+import Home from './pages/Home';
 import Invoices from './pages/Invoices';
+import NewCustomer from './pages/NewCustomer';
+import OrderConfirmation from './pages/OrderConfirmation';
 import Orders from './pages/Orders';
 import Profile from './pages/Profile';
 import Projects from './pages/Projects';
 import Quotes from './pages/Quotes';
-import Tickets from './pages/Tickets';
-import ResellerDashboard from './pages/ResellerDashboard';
-import NewCustomer from './pages/NewCustomer';
 import RequestQuote from './pages/RequestQuote';
+import ResellerDashboard from './pages/ResellerDashboard';
 import Shop from './pages/Shop';
-import CustomerView from './pages/CustomerView';
-import Customers from './pages/Customers';
-import Contact from './pages/Contact';
-import FAQ from './pages/FAQ';
-import OrderConfirmation from './pages/OrderConfirmation';
-import AIAssistant from './pages/AIAssistant';
+import Tickets from './pages/Tickets';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Home": Home,
+    "AIAssistant": AIAssistant,
+    "Contact": Contact,
     "Contracts": Contracts,
+    "CustomerView": CustomerView,
+    "Customers": Customers,
     "Dashboard": Dashboard,
     "Deliveries": Deliveries,
     "Documents": Documents,
+    "FAQ": FAQ,
+    "Home": Home,
     "Invoices": Invoices,
+    "NewCustomer": NewCustomer,
+    "OrderConfirmation": OrderConfirmation,
     "Orders": Orders,
     "Profile": Profile,
     "Projects": Projects,
     "Quotes": Quotes,
-    "Tickets": Tickets,
-    "ResellerDashboard": ResellerDashboard,
-    "NewCustomer": NewCustomer,
     "RequestQuote": RequestQuote,
+    "ResellerDashboard": ResellerDashboard,
     "Shop": Shop,
-    "CustomerView": CustomerView,
-    "Customers": Customers,
-    "Contact": Contact,
-    "FAQ": FAQ,
-    "OrderConfirmation": OrderConfirmation,
-    "AIAssistant": AIAssistant,
+    "Tickets": Tickets,
 }
 
 export const pagesConfig = {
