@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { FileText, Download, Search, Filter, Send, MessageSquare, Check, Square, CheckSquare } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { FileText, Download, Search, Filter, Send, MessageSquare, Check, Square, CheckSquare, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from 'date-fns';
@@ -33,8 +35,16 @@ export default function Quotes() {
   const [selectedQuote, setSelectedQuote] = useState(null);
   const [newComment, setNewComment] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
+  const [customerId, setCustomerId] = useState(null);
 
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const storedCustomerId = localStorage.getItem('activeCustomerId');
+    if (storedCustomerId) {
+      setCustomerId(storedCustomerId);
+    }
+  }, []);
 
   const { data: quotes = [], isLoading } = useQuery({
     queryKey: ['quotes'],
@@ -150,6 +160,16 @@ export default function Quotes() {
         title="Angebote"
         subtitle="Alle Ihre Angebote auf einen Blick"
         icon={FileText}
+        actions={
+          customerId && (
+            <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+              <Link to={createPageUrl(`RequestQuote?customerId=${customerId}`)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Angebot anfordern
+              </Link>
+            </Button>
+          )
+        }
       />
 
       {/* Filters */}
