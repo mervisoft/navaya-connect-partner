@@ -431,7 +431,6 @@ export default function Shop() {
               </Select>
             )}
           </div>
-          </div>
         )}
       </div>
 
