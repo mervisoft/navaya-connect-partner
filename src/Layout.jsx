@@ -146,31 +146,20 @@ export default function Layout({ children, currentPageName }) {
             <Button asChild variant="ghost" size="sm">
               <Link to={createPageUrl('ResellerDashboard')}>
                 <LayoutDashboard className="h-4 w-4 mr-2" />
-                Reseller Dashboard
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link to={createPageUrl('AIAssistant')}>
-                <Bot className="h-4 w-4 mr-2" />
-                KI-Assistent
+                {t('nav.resellerDashboard')}
               </Link>
             </Button>
             <Button asChild variant="ghost" size="sm">
               <Link to={createPageUrl('Contact')}>
-                Kontakt zu Mervisoft
+                {t('nav.contact')}
               </Link>
             </Button>
             <Button asChild variant="ghost" size="sm">
               <Link to={createPageUrl('FAQ')}>
-                FAQ
+                {t('nav.faq')}
               </Link>
             </Button>
-            <Button asChild variant="ghost" size="sm" className="border border-slate-200">
-              <Link to={createPageUrl('DesignGuide')}>
-                <Palette className="h-4 w-4 mr-2" />
-                Design Guide
-              </Link>
-            </Button>
+            <LanguageSwitcher />
           </div>
         </div>
       </header>
