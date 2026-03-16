@@ -158,7 +158,7 @@ export default function Shop() {
       }
       return [...prev, { ...product, quantity: 1 }];
     });
-    toast.success(`${product.name} zum Warenkorb hinzugefügt`);
+    toast.success(`${product.name} ${t('shop.added')}`);
   };
 
   const updateQuantity = (productId, delta) => {
