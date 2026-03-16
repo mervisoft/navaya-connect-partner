@@ -315,7 +315,7 @@ export default function Shop() {
                         onClick={handleCheckout}
                         disabled={createOrderMutation.isPending || !customerId}
                       >
-                        {createOrderMutation.isPending ? 'Bestellt...' : 'Bestellung abschließen'}
+                        {createOrderMutation.isPending ? t('shop.ordering') : t('shop.checkout')}
                       </Button>
                       {!customerId && (
                         <p className="text-xs text-red-600 text-center mt-2">
