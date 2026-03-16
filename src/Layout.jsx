@@ -199,24 +199,18 @@ export default function Layout({ children, currentPageName }) {
                 <DropdownMenuItem asChild>
                   <Link to={createPageUrl('ResellerDashboard')} onClick={handleBackToReseller}>
                     <LayoutDashboard className="h-4 w-4 mr-2" />
-                    Zurück zum Reseller Dashboard
+                    {t('nav.backToReseller')}
                   </Link>
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem asChild>
-                <Link to={createPageUrl('AIAssistant')}>
-                  <Bot className="h-4 w-4 mr-2" />
-                  KI-Assistent
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
                 <Link to={createPageUrl('Contact')}>
-                  Kontakt zu Mervisoft
+                  {t('nav.contact')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to={createPageUrl('FAQ')}>
-                  FAQ
+                  {t('nav.faq')}
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
