@@ -72,14 +72,45 @@ export default function Shop() {
     }).format(amount || 0);
   };
 
+  // Dynamically derive available product lines and subcategories based on active filters
+  const availableProductLines = React.useMemo(() => {
+    const lines = products
+      .filter(p => categoryFilter === 'all' || p.category === categoryFilter)
+      .map(p => p.product_line)
+      .filter(Boolean);
+    return [...new Set(lines)].sort();
+  }, [products, categoryFilter]);
+
+  const availableSubcategories = React.useMemo(() => {
+    const subs = products
+      .filter(p => categoryFilter === 'all' || p.category === categoryFilter)
+      .filter(p => productLineFilter === 'all' || p.product_line === productLineFilter)
+      .map(p => p.subcategory)
+      .filter(Boolean);
+    return [...new Set(subs)].sort();
+  }, [products, categoryFilter, productLineFilter]);
+
   const filteredProducts = products.filter(product => {
     const matchesSearch = 
       product.name?.toLowerCase().includes(search.toLowerCase()) ||
       product.description?.toLowerCase().includes(search.toLowerCase()) ||
       product.manufacturer?.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+    const matchesLine = productLineFilter === 'all' || product.product_line === productLineFilter;
+    const matchesSub = subcategoryFilter === 'all' || product.subcategory === subcategoryFilter;
+    return matchesSearch && matchesCategory && matchesLine && matchesSub;
   });
+
+  const handleCategoryChange = (val) => {
+    setCategoryFilter(val);
+    setProductLineFilter('all');
+    setSubcategoryFilter('all');
+  };
+
+  const handleProductLineChange = (val) => {
+    setProductLineFilter(val);
+    setSubcategoryFilter('all');
+  };
 
   const addToCart = (product) => {
     setCart(prev => {
