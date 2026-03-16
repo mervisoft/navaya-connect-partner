@@ -338,7 +338,7 @@ export default function Shop() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
-              placeholder="Produkte durchsuchen..."
+              placeholder={t('shop.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 bg-white border-slate-200"
