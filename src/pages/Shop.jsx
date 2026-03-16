@@ -296,30 +296,73 @@ export default function Shop() {
       />
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input
-            placeholder="Produkte durchsuchen..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 bg-white border-slate-200"
-          />
+      <div className="flex flex-col gap-3">
+        {/* Row 1: Search + Kategorie */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Produkte durchsuchen..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10 bg-white border-slate-200"
+            />
+          </div>
+          <Select value={categoryFilter} onValueChange={handleCategoryChange}>
+            <SelectTrigger className="w-full sm:w-44 bg-white">
+              <Filter className="h-4 w-4 mr-2 text-slate-400" />
+              <SelectValue placeholder="Kategorie" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Alle Kategorien</SelectItem>
+              <SelectItem value="Software">Software</SelectItem>
+              <SelectItem value="Hardware">Hardware</SelectItem>
+              <SelectItem value="Lizenzen">Lizenzen</SelectItem>
+              <SelectItem value="Services">Services</SelectItem>
+              <SelectItem value="Zubehör">Zubehör</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-full sm:w-48 bg-white">
-            <Filter className="h-4 w-4 mr-2 text-slate-400" />
-            <SelectValue placeholder="Kategorie" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Alle Kategorien</SelectItem>
-            <SelectItem value="Software">Software</SelectItem>
-            <SelectItem value="Hardware">Hardware</SelectItem>
-            <SelectItem value="Lizenzen">Lizenzen</SelectItem>
-            <SelectItem value="Services">Services</SelectItem>
-            <SelectItem value="Zubehör">Zubehör</SelectItem>
-          </SelectContent>
-        </Select>
+
+        {/* Row 2: Produktlinie + Unterkategorie (nur wenn verfügbar) */}
+        {(availableProductLines.length > 0 || availableSubcategories.length > 0) && (
+          <div className="flex flex-col sm:flex-row gap-3">
+            {availableProductLines.length > 0 && (
+              <Select value={productLineFilter} onValueChange={handleProductLineChange}>
+                <SelectTrigger className="w-full sm:w-52 bg-white border-slate-200">
+                  <SelectValue placeholder="Produktlinie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle Produktlinien</SelectItem>
+                  {availableProductLines.map(line => (
+                    <SelectItem key={line} value={line}>{line}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {availableSubcategories.length > 0 && (
+              <Select value={subcategoryFilter} onValueChange={setSubcategoryFilter}>
+                <SelectTrigger className="w-full sm:w-44 bg-white border-slate-200">
+                  <SelectValue placeholder="Lizenztyp" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle Lizenztypen</SelectItem>
+                  {availableSubcategories.map(sub => (
+                    <SelectItem key={sub} value={sub}>{sub}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {(productLineFilter !== 'all' || subcategoryFilter !== 'all') && (
+              <button
+                onClick={() => { setProductLineFilter('all'); setSubcategoryFilter('all'); }}
+                className="text-xs text-slate-500 hover:text-slate-800 underline self-center"
+              >
+                Filter zurücksetzen
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Products List */}
