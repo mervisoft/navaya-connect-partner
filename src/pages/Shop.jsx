@@ -251,7 +251,7 @@ export default function Shop() {
             </SheetTrigger>
             <SheetContent className="w-full sm:max-w-lg">
               <SheetHeader>
-                <SheetTitle>Warenkorb ({cartItemCount} Artikel)</SheetTitle>
+                <SheetTitle>{t('shop.cart')} ({t('shop.cartItems', { count: cartItemCount })})</SheetTitle>
               </SheetHeader>
               
               <div className="mt-6 space-y-4">
