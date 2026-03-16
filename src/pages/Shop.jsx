@@ -241,7 +241,7 @@ export default function Shop() {
             <SheetTrigger asChild>
               <Button className="bg-emerald-600 hover:bg-emerald-700 relative">
                 <ShoppingCart className="h-4 w-4 mr-2" />
-                Warenkorb
+                {t('shop.cart')}
                 {cartItemCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
                     {cartItemCount}
