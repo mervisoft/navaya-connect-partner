@@ -191,7 +191,7 @@ export default function Shop() {
 
   const handleCheckout = () => {
     if (!customerId) {
-      toast.error('Bitte wählen Sie einen Kunden aus');
+      toast.error(t('shop.selectCustomer'));
       return;
     }
 
