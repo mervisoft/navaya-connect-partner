@@ -369,7 +369,7 @@ export default function Shop() {
                   <SelectValue placeholder="Produktlinie" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alle Produktlinien</SelectItem>
+                  <SelectItem value="all">{t('shop.allProductLines')}</SelectItem>
                   {availableProductLines.map(line => (
                     <SelectItem key={line} value={line}>{line}</SelectItem>
                   ))}
@@ -382,7 +382,7 @@ export default function Shop() {
                   <SelectValue placeholder="Lizenztyp" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alle Lizenztypen</SelectItem>
+                  <SelectItem value="all">{t('shop.allSubcategories')}</SelectItem>
                   {availableSubcategories.map(sub => (
                     <SelectItem key={sub} value={sub}>{sub}</SelectItem>
                   ))}
@@ -394,7 +394,7 @@ export default function Shop() {
                 onClick={() => { setProductLineFilter('all'); setSubcategoryFilter('all'); setUpgradeFromFilter('all'); setUpgradeToFilter('all'); }}
                 className="text-xs text-slate-500 hover:text-slate-800 underline self-center"
               >
-                Filter zurücksetzen
+                {t('shop.resetFilters')}
               </button>
             )}
           </div>
@@ -403,28 +403,28 @@ export default function Shop() {
         {/* Row 3: Upgrade-Versionsfilter */}
         {isUpgradeFilterActive && (availableUpgradeFromVersions.length > 0 || availableUpgradeToVersions.length > 0) && (
           <div className="flex flex-col sm:flex-row gap-3 items-center">
-            <span className="text-xs text-slate-500 font-medium shrink-0">Upgrade von:</span>
+            <span className="text-xs text-slate-500 font-medium shrink-0">{t('shop.upgradeFrom')}</span>
             {availableUpgradeFromVersions.length > 0 && (
               <Select value={upgradeFromFilter} onValueChange={(val) => { setUpgradeFromFilter(val); setUpgradeToFilter('all'); }}>
                 <SelectTrigger className="w-full sm:w-44 bg-white border-slate-200">
                   <SelectValue placeholder="Quellversion" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alle Versionen</SelectItem>
+                  <SelectItem value="all">{t('shop.allVersions')}</SelectItem>
                   {availableUpgradeFromVersions.map(v => (
                     <SelectItem key={v} value={v}>{v}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             )}
-            <span className="text-xs text-slate-500 font-medium shrink-0">auf:</span>
+            <span className="text-xs text-slate-500 font-medium shrink-0">{t('shop.upgradeTo')}</span>
             {availableUpgradeToVersions.length > 0 && (
               <Select value={upgradeToFilter} onValueChange={setUpgradeToFilter}>
                 <SelectTrigger className="w-full sm:w-44 bg-white border-slate-200">
                   <SelectValue placeholder="Zielversion" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alle Versionen</SelectItem>
+                  <SelectItem value="all">{t('shop.allVersions')}</SelectItem>
                   {availableUpgradeToVersions.map(v => (
                     <SelectItem key={v} value={v}>{v}</SelectItem>
                   ))}
