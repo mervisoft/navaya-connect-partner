@@ -220,12 +220,12 @@ export default function Shop() {
           <Package className="h-4 w-4 text-emerald-600" />
           <AlertDescription className="flex items-center justify-between">
             <span className="text-emerald-800">
-              Shop für <strong>{customer.company_name}</strong>
+              {t('shop.shopFor')} <strong>{customer.company_name}</strong>
             </span>
             <Button asChild variant="outline" size="sm">
               <Link to={createPageUrl(`CustomerView?id=${customerId}`)}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Zurück zum Kunden
+                {t('shop.backToCustomer')}
               </Link>
             </Button>
           </AlertDescription>
