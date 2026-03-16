@@ -453,17 +453,17 @@ export default function Shop() {
       ) : filteredProducts.length === 0 ? (
         <EmptyState
           icon={Package}
-          title="Keine Produkte gefunden"
-          description="Versuchen Sie andere Suchkriterien"
+          title={t('shop.noProducts')}
+          description={t('shop.noProductsDesc')}
         />
       ) : (
         <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
           {/* Table Header */}
           <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-6 py-3 bg-slate-50 border-b border-slate-100">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Produkt</span>
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider w-28 text-right">Verfügbarkeit</span>
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider w-28 text-right">Preis</span>
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider w-36 text-right">Aktion</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t('shop.product')}</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider w-28 text-right">{t('shop.availability')}</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider w-28 text-right">{t('shop.price')}</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider w-36 text-right">{t('shop.action')}</span>
           </div>
 
           {filteredProducts.map((product, index) => {
@@ -487,7 +487,7 @@ export default function Shop() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-slate-800 text-sm truncate">{product.name}</span>
-                      {product.featured && <Badge className="bg-amber-500 text-[10px] px-1.5 py-0 shrink-0">Top</Badge>}
+                      {product.featured && <Badge className="bg-amber-500 text-[10px] px-1.5 py-0 shrink-0">{t('shop.top')}</Badge>}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       {product.manufacturer && <span className="text-xs text-slate-400">{product.manufacturer}</span>}
@@ -505,7 +505,7 @@ export default function Shop() {
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                       : 'bg-amber-50 text-amber-700 border-amber-200'
                   }`}>
-                    {product.availability || 'Auf Anfrage'}
+                    {product.availability ? t(`availability.${product.availability}`) : t('shop.onRequest')}
                   </span>
                 </div>
 
@@ -536,7 +536,7 @@ export default function Shop() {
                       onClick={() => addToCart(product)}
                     >
                       <Plus className="h-3 w-3 mr-1" />
-                      Hinzufügen
+                      {t('shop.addToCart')}
                     </Button>
                   )}
                 </div>
