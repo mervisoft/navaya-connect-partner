@@ -4,30 +4,21 @@ import { base44 } from '@/api/base44Client';
 import { FileCheck, Download, Search, Filter, Calendar, RefreshCw } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '@/components/shared/PageHeader';
 import StatusBadge from '@/components/shared/StatusBadge';
 import EmptyState from '@/components/shared/EmptyState';
 import DataTable from '@/components/shared/DataTable';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function Contracts() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedContract, setSelectedContract] = useState(null);
+  const { t } = useTranslation();
 
   const { data: contracts = [], isLoading } = useQuery({
     queryKey: ['contracts'],
@@ -35,129 +26,76 @@ export default function Contracts() {
   });
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('de-DE', { 
-      style: 'currency', 
-      currency: 'EUR' 
-    }).format(amount || 0);
+    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount || 0);
   };
 
   const filteredContracts = contracts.filter(contract => {
-    const matchesSearch = 
+    const matchesSearch =
       contract.contract_number?.toLowerCase().includes(search.toLowerCase()) ||
       contract.title?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || contract.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const billingCycleLabels = {
-    monatlich: 'Monatlich',
-    vierteljährlich: 'Vierteljährlich',
-    jährlich: 'Jährlich',
+  const getBillingLabel = (cycle, row) => {
+    if (cycle === 'jährlich') return `${formatCurrency(row.monthly_amount)}/${t('contracts.perYear')}`;
+    if (cycle === 'vierteljährlich') return `${formatCurrency(row.monthly_amount)}/${t('contracts.perQuarter')}`;
+    return `${formatCurrency(row.monthly_amount)}/${t('contracts.perMonth')}`;
   };
 
   const columns = [
-    { 
-      key: 'contract_number', 
-      label: 'Vertrags-Nr.',
-      render: (val) => <span className="font-mono font-medium text-slate-800">{val}</span>
-    },
-    { 
-      key: 'title', 
-      label: 'Bezeichnung',
-      render: (val) => <span className="text-slate-700">{val}</span>
-    },
-    { 
-      key: 'start_date', 
-      label: 'Laufzeit',
-      render: (val, row) => {
-        if (!val) return '-';
-        const start = format(new Date(val), 'dd.MM.yy', { locale: de });
-        const end = row.end_date ? format(new Date(row.end_date), 'dd.MM.yy', { locale: de }) : 'unbefristet';
-        return `${start} - ${end}`;
-      }
-    },
-    { 
-      key: 'monthly_amount', 
-      label: 'Betrag',
-      render: (val, row) => (
-        <div>
-          <span className="font-semibold text-slate-800">{formatCurrency(val)}</span>
-          <span className="text-xs text-slate-500 ml-1">/{row.billing_cycle === 'jährlich' ? 'Jahr' : row.billing_cycle === 'vierteljährlich' ? 'Quartal' : 'Monat'}</span>
-        </div>
-      )
-    },
-    { 
-      key: 'auto_renew', 
-      label: 'Verlängerung',
-      render: (val) => val ? (
-        <span className="inline-flex items-center gap-1 text-emerald-600 text-xs font-medium">
-          <RefreshCw className="h-3 w-3" /> Automatisch
-        </span>
-      ) : (
-        <span className="text-slate-500 text-xs">Manuell</span>
-      )
-    },
-    { 
-      key: 'status', 
-      label: 'Status',
-      render: (val) => <StatusBadge status={val} />
-    },
+    { key: 'contract_number', label: t('contracts.contractNumber'), render: (val) => <span className="font-mono font-medium text-slate-800">{val}</span> },
+    { key: 'title', label: t('contracts.label'), render: (val) => <span className="text-slate-700">{val}</span> },
+    { key: 'start_date', label: t('contracts.duration'), render: (val, row) => {
+      if (!val) return '-';
+      const start = format(new Date(val), 'dd.MM.yy', { locale: de });
+      const end = row.end_date ? format(new Date(row.end_date), 'dd.MM.yy', { locale: de }) : t('contracts.unlimited');
+      return `${start} - ${end}`;
+    }},
+    { key: 'monthly_amount', label: t('contracts.amount'), render: (val, row) => (
+      <div>
+        <span className="font-semibold text-slate-800">{formatCurrency(val)}</span>
+        <span className="text-xs text-slate-500 ml-1">/{row.billing_cycle === 'jährlich' ? t('contracts.perYear') : row.billing_cycle === 'vierteljährlich' ? t('contracts.perQuarter') : t('contracts.perMonth')}</span>
+      </div>
+    )},
+    { key: 'auto_renew', label: t('contracts.renewal'), render: (val) => val ? (
+      <span className="inline-flex items-center gap-1 text-emerald-600 text-xs font-medium"><RefreshCw className="h-3 w-3" />{t('contracts.renewalAuto')}</span>
+    ) : (
+      <span className="text-slate-500 text-xs">{t('contracts.renewalManual')}</span>
+    )},
+    { key: 'status', label: t('common.status'), render: (val) => <StatusBadge status={val} /> },
   ];
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Verträge"
-        subtitle="Ihre aktiven und vergangenen Verträge"
-        icon={FileCheck}
-      />
+      <PageHeader title={t('contracts.title')} subtitle={t('contracts.subtitle')} icon={FileCheck} />
 
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input
-            placeholder="Suche nach Vertrags-Nr. oder Bezeichnung..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 bg-white border-slate-200"
-          />
+          <Input placeholder={t('contracts.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 bg-white border-slate-200" />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-full sm:w-48 bg-white">
             <Filter className="h-4 w-4 mr-2 text-slate-400" />
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t('common.status')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Alle Status</SelectItem>
-            <SelectItem value="aktiv">Aktiv</SelectItem>
-            <SelectItem value="gekündigt">Gekündigt</SelectItem>
-            <SelectItem value="ausgelaufen">Ausgelaufen</SelectItem>
-            <SelectItem value="entwurf">Entwurf</SelectItem>
+            <SelectItem value="all">{t('contracts.allStatus')}</SelectItem>
+            <SelectItem value="aktiv">{t('contracts.statusActive')}</SelectItem>
+            <SelectItem value="gekündigt">{t('contracts.statusTerminated')}</SelectItem>
+            <SelectItem value="ausgelaufen">{t('contracts.statusExpired')}</SelectItem>
+            <SelectItem value="entwurf">{t('contracts.statusDraft')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {/* Table or Empty State */}
       {!isLoading && filteredContracts.length === 0 ? (
-        <EmptyState
-          icon={FileCheck}
-          title="Keine Verträge gefunden"
-          description={search || statusFilter !== 'all' 
-            ? "Versuchen Sie andere Suchkriterien"
-            : "Es sind noch keine Verträge vorhanden"
-          }
-        />
+        <EmptyState icon={FileCheck} title={t('contracts.noFound')} description={search || statusFilter !== 'all' ? t('contracts.noFoundSearch') : t('contracts.noFoundEmpty')} />
       ) : (
-        <DataTable
-          columns={columns}
-          data={filteredContracts}
-          isLoading={isLoading}
-          onRowClick={setSelectedContract}
-        />
+        <DataTable columns={columns} data={filteredContracts} isLoading={isLoading} onRowClick={setSelectedContract} />
       )}
 
-      {/* Detail Dialog */}
       <Dialog open={!!selectedContract} onOpenChange={() => setSelectedContract(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -171,49 +109,38 @@ export default function Contracts() {
               </div>
             </DialogTitle>
           </DialogHeader>
-          
+
           {selectedContract && (
             <div className="space-y-6 mt-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-50 rounded-xl p-4">
-                  <p className="text-xs text-slate-500 mb-1">Status</p>
+                  <p className="text-xs text-slate-500 mb-1">{t('common.status')}</p>
                   <StatusBadge status={selectedContract.status} />
                 </div>
                 <div className="bg-slate-50 rounded-xl p-4">
-                  <p className="text-xs text-slate-500 mb-1">Betrag</p>
+                  <p className="text-xs text-slate-500 mb-1">{t('contracts.amount')}</p>
                   <p className="text-xl font-bold text-slate-800">{formatCurrency(selectedContract.monthly_amount)}</p>
-                  <p className="text-xs text-slate-500">{billingCycleLabels[selectedContract.billing_cycle]}</p>
-                </div>
-                <div className="bg-slate-50 rounded-xl p-4">
-                  <p className="text-xs text-slate-500 mb-1">Vertragsbeginn</p>
-                  <p className="font-medium text-slate-700">
-                    {selectedContract.start_date 
-                      ? format(new Date(selectedContract.start_date), 'dd. MMMM yyyy', { locale: de })
-                      : '-'
-                    }
+                  <p className="text-xs text-slate-500">
+                    {selectedContract.billing_cycle === 'jährlich' ? t('contracts.billingYearly') : selectedContract.billing_cycle === 'vierteljährlich' ? t('contracts.billingQuarterly') : t('contracts.billingMonthly')}
                   </p>
                 </div>
                 <div className="bg-slate-50 rounded-xl p-4">
-                  <p className="text-xs text-slate-500 mb-1">Vertragsende</p>
-                  <p className="font-medium text-slate-700">
-                    {selectedContract.end_date 
-                      ? format(new Date(selectedContract.end_date), 'dd. MMMM yyyy', { locale: de })
-                      : 'Unbefristet'
-                    }
-                  </p>
+                  <p className="text-xs text-slate-500 mb-1">{t('contracts.startDate')}</p>
+                  <p className="font-medium text-slate-700">{selectedContract.start_date ? format(new Date(selectedContract.start_date), 'dd. MMMM yyyy', { locale: de }) : '-'}</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-4">
+                  <p className="text-xs text-slate-500 mb-1">{t('contracts.endDate')}</p>
+                  <p className="font-medium text-slate-700">{selectedContract.end_date ? format(new Date(selectedContract.end_date), 'dd. MMMM yyyy', { locale: de }) : t('contracts.unlimited')}</p>
                 </div>
               </div>
 
-              {/* Remaining time */}
               {selectedContract.status === 'aktiv' && selectedContract.end_date && (
                 <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
                   <div className="flex items-center gap-3">
                     <Calendar className="h-5 w-5 text-blue-500" />
                     <div>
-                      <p className="font-medium text-blue-800">Verbleibende Laufzeit</p>
-                      <p className="text-sm text-blue-600">
-                        {differenceInDays(new Date(selectedContract.end_date), new Date())} Tage
-                      </p>
+                      <p className="font-medium text-blue-800">{t('contracts.remainingTime')}</p>
+                      <p className="text-sm text-blue-600">{t('contracts.remainingDays', { days: differenceInDays(new Date(selectedContract.end_date), new Date()) })}</p>
                     </div>
                   </div>
                 </div>
@@ -222,15 +149,8 @@ export default function Contracts() {
               <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl">
                 <RefreshCw className={`h-5 w-5 ${selectedContract.auto_renew ? 'text-emerald-500' : 'text-slate-400'}`} />
                 <div>
-                  <p className="font-medium text-slate-700">
-                    {selectedContract.auto_renew ? 'Automatische Verlängerung aktiv' : 'Keine automatische Verlängerung'}
-                  </p>
-                  <p className="text-sm text-slate-500">
-                    {selectedContract.auto_renew 
-                      ? 'Der Vertrag verlängert sich automatisch zum Vertragsende'
-                      : 'Der Vertrag endet zum angegebenen Datum'
-                    }
-                  </p>
+                  <p className="font-medium text-slate-700">{selectedContract.auto_renew ? t('contracts.autoRenewActive') : t('contracts.autoRenewInactive')}</p>
+                  <p className="text-sm text-slate-500">{selectedContract.auto_renew ? t('contracts.autoRenewDesc') : t('contracts.noAutoRenewDesc')}</p>
                 </div>
               </div>
 
@@ -238,7 +158,7 @@ export default function Contracts() {
                 <Button asChild className="w-full">
                   <a href={selectedContract.file_url} target="_blank" rel="noopener noreferrer">
                     <Download className="h-4 w-4 mr-2" />
-                    Vertrag herunterladen
+                    {t('contracts.download')}
                   </a>
                 </Button>
               )}
