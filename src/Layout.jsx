@@ -17,10 +17,10 @@ import {
   LogOut,
   User,
   ChevronDown,
-  Bot,
-  Calculator,
-  Palette
+  Calculator
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,26 +29,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const resellerNavItems = [
-  { name: 'Dashboard', icon: LayoutDashboard, page: 'ResellerDashboard' },
-  { name: 'Kunden', icon: User, page: 'Customers' },
+const getResellerNavItems = (t) => [
+  { name: t('nav.dashboard'), icon: LayoutDashboard, page: 'ResellerDashboard' },
+  { name: t('nav.customers'), icon: User, page: 'Customers' },
 ];
 
-const getCustomerNavItems = () => {
+const getCustomerNavItems = (t) => {
   const customerId = localStorage.getItem('activeCustomerId');
   return [
-    { name: 'Dashboard', icon: LayoutDashboard, page: 'CustomerView', params: customerId ? `?id=${customerId}` : '' },
-    { name: 'Shop', icon: ShoppingCart, page: 'Shop', params: customerId ? `?customerId=${customerId}` : '' },
-    { name: 'Angebot anfordern', icon: FileText, page: 'RequestQuote', params: customerId ? `?customerId=${customerId}` : '' },
-    { name: 'Vertragsanpassung', icon: Calculator, page: 'LicenseExtension', params: '' },
-    { name: 'Angebote', icon: FileText, page: 'Quotes', params: '' },
-    { name: 'Aufträge', icon: ShoppingCart, page: 'Orders', params: '' },
-    { name: 'Rechnungen', icon: Receipt, page: 'Invoices', params: '' },
-    { name: 'Lieferscheine', icon: Truck, page: 'Deliveries', params: '' },
-    { name: 'Tickets', icon: TicketCheck, page: 'Tickets', params: '' },
-    { name: 'Verträge', icon: FileCheck, page: 'Contracts', params: '' },
-    { name: 'Projekte', icon: FolderKanban, page: 'Projects', params: '' },
-    { name: 'Dokumente', icon: Files, page: 'Documents', params: '' },
+    { name: t('nav.dashboard'), icon: LayoutDashboard, page: 'CustomerView', params: customerId ? `?id=${customerId}` : '' },
+    { name: t('nav.shop'), icon: ShoppingCart, page: 'Shop', params: customerId ? `?customerId=${customerId}` : '' },
+    { name: t('nav.requestQuote'), icon: FileText, page: 'RequestQuote', params: customerId ? `?customerId=${customerId}` : '' },
+    { name: t('nav.licenseExtension'), icon: Calculator, page: 'LicenseExtension', params: '' },
+    { name: t('nav.quotes'), icon: FileText, page: 'Quotes', params: '' },
+    { name: t('nav.orders'), icon: ShoppingCart, page: 'Orders', params: '' },
+    { name: t('nav.invoices'), icon: Receipt, page: 'Invoices', params: '' },
+    { name: t('nav.deliveries'), icon: Truck, page: 'Deliveries', params: '' },
+    { name: t('nav.tickets'), icon: TicketCheck, page: 'Tickets', params: '' },
+    { name: t('nav.contracts'), icon: FileCheck, page: 'Contracts', params: '' },
+    { name: t('nav.projects'), icon: FolderKanban, page: 'Projects', params: '' },
+    { name: t('nav.documents'), icon: Files, page: 'Documents', params: '' },
   ];
 };
 
