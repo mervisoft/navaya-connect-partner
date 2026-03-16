@@ -44,6 +44,8 @@ export default function Shop() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [productLineFilter, setProductLineFilter] = useState('all');
   const [subcategoryFilter, setSubcategoryFilter] = useState('all');
+  const [upgradeFromFilter, setUpgradeFromFilter] = useState('all');
+  const [upgradeToFilter, setUpgradeToFilter] = useState('all');
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [customerId, setCustomerId] = useState(null);
