@@ -306,7 +306,7 @@ export default function Shop() {
 
                     <div className="border-t border-slate-200 pt-4">
                       <div className="flex justify-between items-center mb-4">
-                        <span className="text-lg font-semibold text-slate-800">Gesamtsumme:</span>
+                        <span className="text-lg font-semibold text-slate-800">{t('shop.total')}</span>
                         <span className="text-2xl font-bold text-slate-900">{formatCurrency(cartTotal)}</span>
                       </div>
                       <Button 
