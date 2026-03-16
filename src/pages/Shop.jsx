@@ -350,12 +350,12 @@ export default function Shop() {
               <SelectValue placeholder="Kategorie" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle Kategorien</SelectItem>
-              <SelectItem value="Software">Software</SelectItem>
-              <SelectItem value="Hardware">Hardware</SelectItem>
-              <SelectItem value="Lizenzen">Lizenzen</SelectItem>
-              <SelectItem value="Services">Services</SelectItem>
-              <SelectItem value="Zubehör">Zubehör</SelectItem>
+              <SelectItem value="all">{t('shop.allCategories')}</SelectItem>
+              <SelectItem value="Software">{t('categories.Software')}</SelectItem>
+              <SelectItem value="Hardware">{t('categories.Hardware')}</SelectItem>
+              <SelectItem value="Lizenzen">{t('categories.Lizenzen')}</SelectItem>
+              <SelectItem value="Services">{t('categories.Services')}</SelectItem>
+              <SelectItem value="Zubehör">{t('categories.Zubehör')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
