@@ -137,7 +137,7 @@ export default function Layout({ children, currentPageName }) {
               <Button asChild variant="outline" size="sm" onClick={handleBackToReseller}>
                 <Link to={createPageUrl('ResellerDashboard')}>
                   <LayoutDashboard className="h-4 w-4 mr-2" />
-                  Zurück zum Reseller Dashboard
+                  {t('nav.backToReseller')}
                 </Link>
               </Button>
             )}
@@ -235,10 +235,10 @@ export default function Layout({ children, currentPageName }) {
               </div>
               <div className="flex-1 min-w-0">
                 <h1 className="font-bold text-slate-800 text-lg tracking-tight">
-                  {currentCustomer ? 'Kundenansicht' : 'Kundenportal'}
+                  {currentCustomer ? t('nav.customerView') : t('nav.portal')}
                 </h1>
                 <p className="text-xs text-slate-400 truncate">
-                  {currentCustomer ? currentCustomer.company_name : 'Self-Service Center'}
+                  {currentCustomer ? currentCustomer.company_name : t('nav.selfService')}
                 </p>
               </div>
             </div>
@@ -295,12 +295,12 @@ export default function Layout({ children, currentPageName }) {
                   <DropdownMenuItem asChild>
                     <Link to={createPageUrl('Profile')} className="cursor-pointer">
                       <User className="h-4 w-4 mr-2" />
-                      Profil bearbeiten
+                      {t('nav.editProfile')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                     <LogOut className="h-4 w-4 mr-2" />
-                    Abmelden
+                    {t('nav.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
