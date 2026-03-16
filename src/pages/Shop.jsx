@@ -40,6 +40,7 @@ import {
 
 export default function Shop() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [productLineFilter, setProductLineFilter] = useState('all');
