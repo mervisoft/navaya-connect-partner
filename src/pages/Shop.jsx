@@ -10,10 +10,10 @@ import {
   Plus,
   Minus,
   Trash2,
-  X,
   Package,
   ArrowLeft
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion, AnimatePresence } from 'framer-motion';
