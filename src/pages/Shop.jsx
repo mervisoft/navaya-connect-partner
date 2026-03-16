@@ -319,7 +319,7 @@ export default function Shop() {
                       </Button>
                       {!customerId && (
                         <p className="text-xs text-red-600 text-center mt-2">
-                          Bitte wählen Sie zuerst einen Kunden aus
+                          {t('shop.noCustomer')}
                         </p>
                       )}
                     </div>
