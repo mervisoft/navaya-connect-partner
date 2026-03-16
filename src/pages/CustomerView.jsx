@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
@@ -43,7 +43,7 @@ export default function CustomerView() {
   const { data: tickets = [] } = useQuery({ queryKey: ['tickets'], queryFn: () => base44.entities.Ticket.list('-created_date', 10), enabled: !!customerId });
   const { data: contracts = [] } = useQuery({ queryKey: ['contracts'], queryFn: () => base44.entities.Contract.list('-created_date', 10), enabled: !!customerId });
 
-  const allActivities = React.useMemo(() => {
+  const allActivities = useMemo(() => {
     const activities = [];
     quotes.forEach(q => activities.push({ type: 'quote', date: q.created_date, data: q }));
     orders.forEach(o => activities.push({ type: 'order', date: o.created_date, data: o }));
@@ -57,7 +57,7 @@ export default function CustomerView() {
 
   const formatCurrency = (amount) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount || 0);
 
-  const salesData = React.useMemo(() => {
+  const salesData = useMemo(() => {
     const monthlyData = {};
     const categoryData = {};
     [...invoices, ...allOrders].forEach(item => {
