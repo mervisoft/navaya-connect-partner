@@ -69,6 +69,7 @@ import ResellerDashboard from './pages/ResellerDashboard';
 import Shop from './pages/Shop';
 import Tickets from './pages/Tickets';
 import LicenseExtension from './pages/LicenseExtension';
+import DesignGuide from './pages/DesignGuide';
 import __Layout from './Layout.jsx';
 
 
@@ -95,6 +96,7 @@ export const PAGES = {
     "Shop": Shop,
     "Tickets": Tickets,
     "LicenseExtension": LicenseExtension,
+    "DesignGuide": DesignGuide,
 }
 
 export const pagesConfig = {
