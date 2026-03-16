@@ -17,7 +17,8 @@ import {
   LogOut,
   User,
   ChevronDown,
-  Bot
+  Bot,
+  Calculator
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
@@ -38,6 +39,7 @@ const getCustomerNavItems = () => {
     { name: 'Dashboard', icon: LayoutDashboard, page: 'CustomerView', params: customerId ? `?id=${customerId}` : '' },
     { name: 'Shop', icon: ShoppingCart, page: 'Shop', params: customerId ? `?customerId=${customerId}` : '' },
     { name: 'Angebot anfordern', icon: FileText, page: 'RequestQuote', params: customerId ? `?customerId=${customerId}` : '' },
+    { name: 'Vertragsanpassung', icon: Calculator, page: 'LicenseExtension', params: '' },
     { name: 'Angebote', icon: FileText, page: 'Quotes', params: '' },
     { name: 'Aufträge', icon: ShoppingCart, page: 'Orders', params: '' },
     { name: 'Rechnungen', icon: Receipt, page: 'Invoices', params: '' },
