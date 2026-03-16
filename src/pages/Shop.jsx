@@ -73,7 +73,7 @@ export default function Shop() {
   };
 
   // Dynamically derive available product lines and subcategories based on active filters
-  const availableProductLines = React.useMemo(() => {
+  const availableProductLines = useMemo(() => {
     const lines = products
       .filter(p => categoryFilter === 'all' || p.category === categoryFilter)
       .map(p => p.product_line)
@@ -81,7 +81,7 @@ export default function Shop() {
     return [...new Set(lines)].sort();
   }, [products, categoryFilter]);
 
-  const availableSubcategories = React.useMemo(() => {
+  const availableSubcategories = useMemo(() => {
     const subs = products
       .filter(p => categoryFilter === 'all' || p.category === categoryFilter)
       .filter(p => productLineFilter === 'all' || p.product_line === productLineFilter)
