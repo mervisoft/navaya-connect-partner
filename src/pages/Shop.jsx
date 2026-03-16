@@ -289,14 +289,18 @@ export default function Shop() {
         </Select>
       </div>
 
-      {/* Products Grid */}
+      {/* Products List */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-slate-200 p-6 animate-pulse">
-              <div className="aspect-square bg-slate-200 rounded-lg mb-4" />
-              <div className="h-4 bg-slate-200 rounded w-3/4 mb-2" />
-              <div className="h-3 bg-slate-200 rounded w-1/2" />
+            <div key={i} className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 animate-pulse">
+              <div className="w-10 h-10 bg-slate-200 rounded-lg shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-slate-200 rounded w-1/3" />
+                <div className="h-3 bg-slate-200 rounded w-1/4" />
+              </div>
+              <div className="h-4 bg-slate-200 rounded w-20" />
+              <div className="h-8 bg-slate-200 rounded w-28" />
             </div>
           ))}
         </div>
@@ -307,74 +311,92 @@ export default function Shop() {
           description="Versuchen Sie andere Suchkriterien"
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <AnimatePresence>
-            {filteredProducts.map((product, index) => (
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          {/* Table Header */}
+          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-6 py-3 bg-slate-50 border-b border-slate-100">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Produkt</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider w-28 text-right">Verfügbarkeit</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider w-28 text-right">Preis</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider w-36 text-right">Aktion</span>
+          </div>
+
+          {filteredProducts.map((product, index) => {
+            const cartItem = cart.find(i => i.id === product.id);
+            return (
               <motion.div
                 key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition-all group"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: index * 0.02 }}
+                className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-6 py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50/70 transition-colors"
               >
-                <div className="aspect-square bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative overflow-hidden">
-                  {product.image_url ? (
-                    <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <Package className="h-24 w-24 text-slate-400" />
-                  )}
-                  {product.featured && (
-                    <div className="absolute top-3 right-3">
-                      <Badge className="bg-amber-500">Empfohlen</Badge>
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-6">
-                  <div className="mb-3">
-                    <Badge variant="outline" className="mb-2">{product.category}</Badge>
-                    <h3 className="font-semibold text-slate-800 mb-1 group-hover:text-[#1e3a5f] transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="text-xs text-slate-500">{product.manufacturer}</p>
+                {/* Product Info */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
+                    {product.image_url
+                      ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+                      : <Package className="h-5 w-5 text-slate-400" />
+                    }
                   </div>
-
-                  {product.description && (
-                    <p className="text-sm text-slate-600 mb-4 line-clamp-2">
-                      {product.description}
-                    </p>
-                  )}
-
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <p className="text-2xl font-bold text-slate-900">{formatCurrency(product.price)}</p>
-                      {product.list_price && product.list_price > product.price && (
-                        <p className="text-xs text-slate-400 line-through">{formatCurrency(product.list_price)}</p>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-slate-800 text-sm truncate">{product.name}</span>
+                      {product.featured && <Badge className="bg-amber-500 text-[10px] px-1.5 py-0 shrink-0">Top</Badge>}
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {product.manufacturer && <span className="text-xs text-slate-400">{product.manufacturer}</span>}
+                      {product.category && (
+                        <span className="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">{product.category}</span>
                       )}
                     </div>
-                    <Badge 
-                      variant="outline" 
-                      className={
-                        product.availability === 'Auf Lager' 
-                          ? 'border-emerald-200 text-emerald-700 bg-emerald-50' 
-                          : 'border-amber-200 text-amber-700 bg-amber-50'
-                      }
-                    >
-                      {product.availability}
-                    </Badge>
                   </div>
+                </div>
 
-                  <Button 
-                    className="w-full bg-[#1e3a5f] hover:bg-[#2d4a6f]"
-                    onClick={() => addToCart(product)}
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    In den Warenkorb
-                  </Button>
+                {/* Availability */}
+                <div className="w-28 text-right">
+                  <span className={`text-xs font-medium px-2 py-1 rounded-md border ${
+                    product.availability === 'Auf Lager'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-amber-50 text-amber-700 border-amber-200'
+                  }`}>
+                    {product.availability || 'Auf Anfrage'}
+                  </span>
+                </div>
+
+                {/* Price */}
+                <div className="w-28 text-right">
+                  <p className="font-bold text-slate-900 text-sm">{formatCurrency(product.price)}</p>
+                  {product.list_price && product.list_price > product.price && (
+                    <p className="text-xs text-slate-400 line-through">{formatCurrency(product.list_price)}</p>
+                  )}
+                </div>
+
+                {/* Add to Cart */}
+                <div className="w-36 flex justify-end">
+                  {cartItem ? (
+                    <div className="flex items-center gap-1">
+                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(product.id, -1)}>
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                      <span className="w-8 text-center text-sm font-semibold text-slate-800">{cartItem.quantity}</span>
+                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(product.id, 1)}>
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      size="sm"
+                      className="bg-[#1e3a5f] hover:bg-[#2d4a6f] h-8 text-xs"
+                      onClick={() => addToCart(product)}
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      Hinzufügen
+                    </Button>
+                  )}
                 </div>
               </motion.div>
-            ))}
-          </AnimatePresence>
+            );
+          })}
         </div>
       )}
     </div>
