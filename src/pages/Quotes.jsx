@@ -3,11 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { FileText, Download, Search, Filter, Send, MessageSquare, Check, Square, CheckSquare, Plus } from 'lucide-react';
+import { FileText, Download, Search, Filter, Send, MessageSquare, Check, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '@/components/shared/PageHeader';
 import StatusBadge from '@/components/shared/StatusBadge';
 import EmptyState from '@/components/shared/EmptyState';
@@ -15,19 +16,8 @@ import DataTable from '@/components/shared/DataTable';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function Quotes() {
   const [search, setSearch] = useState('');
@@ -36,14 +26,13 @@ export default function Quotes() {
   const [newComment, setNewComment] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
   const [customerId, setCustomerId] = useState(null);
+  const { t } = useTranslation();
 
   const queryClient = useQueryClient();
 
   useEffect(() => {
     const storedCustomerId = localStorage.getItem('activeCustomerId');
-    if (storedCustomerId) {
-      setCustomerId(storedCustomerId);
-    }
+    if (storedCustomerId) setCustomerId(storedCustomerId);
   }, []);
 
   const { data: quotes = [], isLoading } = useQuery({
@@ -61,12 +50,7 @@ export default function Quotes() {
       const quote = quotes.find(q => q.id === quoteId);
       const updatedComments = [
         ...(quote.comments || []),
-        {
-          author: currentUser?.full_name || currentUser?.email || 'Kunde',
-          message: comment,
-          date: new Date().toISOString(),
-          is_customer_comment: true,
-        }
+        { author: currentUser?.full_name || currentUser?.email || 'Kunde', message: comment, date: new Date().toISOString(), is_customer_comment: true }
       ];
       return base44.entities.Quote.update(quoteId, { comments: updatedComments });
     },
@@ -87,34 +71,25 @@ export default function Quotes() {
   };
 
   const toggleItem = (index) => {
-    setSelectedItems(prev => 
-      prev.includes(index) 
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
-    );
+    setSelectedItems(prev => prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]);
   };
 
   const calculateSelectedTotal = () => {
     if (!selectedQuote?.items) return 0;
-    return selectedQuote.items
-      .filter((_, idx) => selectedItems.includes(idx))
-      .reduce((sum, item) => sum + (item.total || 0), 0);
+    return selectedQuote.items.filter((_, idx) => selectedItems.includes(idx)).reduce((sum, item) => sum + (item.total || 0), 0);
   };
 
   const handleAcceptQuote = () => {
-    toast.success('Angebot wurde erfolgreich angenommen! Wir werden uns in Kürze bei Ihnen melden.');
+    toast.success(t('quotes.acceptSuccess'));
     setSelectedQuote(null);
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('de-DE', { 
-      style: 'currency', 
-      currency: 'EUR' 
-    }).format(amount || 0);
+    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount || 0);
   };
 
   const filteredQuotes = quotes.filter(quote => {
-    const matchesSearch = 
+    const matchesSearch =
       quote.quote_number?.toLowerCase().includes(search.toLowerCase()) ||
       quote.title?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || quote.status === statusFilter;
@@ -122,102 +97,58 @@ export default function Quotes() {
   });
 
   const columns = [
-    { 
-      key: 'quote_number', 
-      label: 'Angebots-Nr.',
-      render: (val) => <span className="font-mono font-medium text-slate-800">{val}</span>
-    },
-    { 
-      key: 'title', 
-      label: 'Titel',
-      render: (val) => <span className="text-slate-700">{val}</span>
-    },
-    { 
-      key: 'created_date', 
-      label: 'Datum',
-      render: (val) => val ? format(new Date(val), 'dd.MM.yyyy', { locale: de }) : '-'
-    },
-    { 
-      key: 'valid_until', 
-      label: 'Gültig bis',
-      render: (val) => val ? format(new Date(val), 'dd.MM.yyyy', { locale: de }) : '-'
-    },
-    { 
-      key: 'amount', 
-      label: 'Betrag',
-      render: (val) => <span className="font-semibold text-slate-800">{formatCurrency(val)}</span>
-    },
-    { 
-      key: 'status', 
-      label: 'Status',
-      render: (val) => <StatusBadge status={val} />
-    },
+    { key: 'quote_number', label: t('quotes.quoteNumber'), render: (val) => <span className="font-mono font-medium text-slate-800">{val}</span> },
+    { key: 'title', label: t('quotes.titleCol'), render: (val) => <span className="text-slate-700">{val}</span> },
+    { key: 'created_date', label: t('quotes.date'), render: (val) => val ? format(new Date(val), 'dd.MM.yyyy', { locale: de }) : '-' },
+    { key: 'valid_until', label: t('quotes.validUntil'), render: (val) => val ? format(new Date(val), 'dd.MM.yyyy', { locale: de }) : '-' },
+    { key: 'amount', label: t('quotes.amount'), render: (val) => <span className="font-semibold text-slate-800">{formatCurrency(val)}</span> },
+    { key: 'status', label: t('common.status'), render: (val) => <StatusBadge status={val} /> },
   ];
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Angebote"
-        subtitle="Alle Ihre Angebote auf einen Blick"
+        title={t('quotes.title')}
+        subtitle={t('quotes.subtitle')}
         icon={FileText}
         actions={
           customerId && (
             <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
               <Link to={createPageUrl(`RequestQuote?customerId=${customerId}`)}>
                 <Plus className="h-4 w-4 mr-2" />
-                Angebot anfordern
+                {t('quotes.requestNew')}
               </Link>
             </Button>
           )
         }
       />
 
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input
-            placeholder="Suche nach Angebots-Nr. oder Titel..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 bg-white border-slate-200"
-          />
+          <Input placeholder={t('quotes.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 bg-white border-slate-200" />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-full sm:w-48 bg-white">
             <Filter className="h-4 w-4 mr-2 text-slate-400" />
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t('common.status')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Alle Status</SelectItem>
-            <SelectItem value="offen">Offen</SelectItem>
-            <SelectItem value="angenommen">Angenommen</SelectItem>
-            <SelectItem value="abgelehnt">Abgelehnt</SelectItem>
-            <SelectItem value="abgelaufen">Abgelaufen</SelectItem>
+            <SelectItem value="all">{t('quotes.allStatus')}</SelectItem>
+            <SelectItem value="offen">{t('quotes.statusOpen')}</SelectItem>
+            <SelectItem value="angenommen">{t('quotes.statusAccepted')}</SelectItem>
+            <SelectItem value="abgelehnt">{t('quotes.statusRejected')}</SelectItem>
+            <SelectItem value="abgelaufen">{t('quotes.statusExpired')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {/* Table or Empty State */}
       {!isLoading && filteredQuotes.length === 0 ? (
-        <EmptyState
-          icon={FileText}
-          title="Keine Angebote gefunden"
-          description={search || statusFilter !== 'all' 
-            ? "Versuchen Sie andere Suchkriterien"
-            : "Es sind noch keine Angebote vorhanden"
-          }
-        />
+        <EmptyState icon={FileText} title={t('quotes.noFound')} description={search || statusFilter !== 'all' ? t('quotes.noFoundSearch') : t('quotes.noFoundEmpty')} />
       ) : (
-        <DataTable
-          columns={columns}
-          data={filteredQuotes}
-          isLoading={isLoading}
-          onRowClick={handleQuoteSelection}
-        />
+        <DataTable columns={columns} data={filteredQuotes} isLoading={isLoading} onRowClick={handleQuoteSelection} />
       )}
 
-      {/* Detail Dialog */}
       <Dialog open={!!selectedQuote} onOpenChange={() => setSelectedQuote(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -231,92 +162,48 @@ export default function Quotes() {
               </div>
             </DialogTitle>
           </DialogHeader>
-          
+
           {selectedQuote && (
             <div className="space-y-6 mt-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-50 rounded-xl p-4">
-                  <p className="text-xs text-slate-500 mb-1">Status</p>
-                  <StatusBadge status={selectedQuote.status} />
-                </div>
-                <div className="bg-slate-50 rounded-xl p-4">
-                  <p className="text-xs text-slate-500 mb-1">Gesamtbetrag</p>
-                  <p className="text-xl font-bold text-slate-800">{formatCurrency(selectedQuote.amount)}</p>
-                </div>
-                <div className="bg-slate-50 rounded-xl p-4">
-                  <p className="text-xs text-slate-500 mb-1">Erstelldatum</p>
-                  <p className="font-medium text-slate-700">
-                    {selectedQuote.created_date && format(new Date(selectedQuote.created_date), 'dd. MMMM yyyy', { locale: de })}
-                  </p>
-                </div>
-                <div className="bg-slate-50 rounded-xl p-4">
-                  <p className="text-xs text-slate-500 mb-1">Gültig bis</p>
-                  <p className="font-medium text-slate-700">
-                    {selectedQuote.valid_until 
-                      ? format(new Date(selectedQuote.valid_until), 'dd. MMMM yyyy', { locale: de })
-                      : '-'
-                    }
-                  </p>
-                </div>
+                <div className="bg-slate-50 rounded-xl p-4"><p className="text-xs text-slate-500 mb-1">{t('common.status')}</p><StatusBadge status={selectedQuote.status} /></div>
+                <div className="bg-slate-50 rounded-xl p-4"><p className="text-xs text-slate-500 mb-1">{t('quotes.totalAmount')}</p><p className="text-xl font-bold text-slate-800">{formatCurrency(selectedQuote.amount)}</p></div>
+                <div className="bg-slate-50 rounded-xl p-4"><p className="text-xs text-slate-500 mb-1">{t('quotes.createdDate')}</p><p className="font-medium text-slate-700">{selectedQuote.created_date && format(new Date(selectedQuote.created_date), 'dd. MMMM yyyy', { locale: de })}</p></div>
+                <div className="bg-slate-50 rounded-xl p-4"><p className="text-xs text-slate-500 mb-1">{t('quotes.validUntil')}</p><p className="font-medium text-slate-700">{selectedQuote.valid_until ? format(new Date(selectedQuote.valid_until), 'dd. MMMM yyyy', { locale: de }) : '-'}</p></div>
               </div>
 
               {selectedQuote.items?.length > 0 && (
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-semibold text-slate-800">Positionen auswählen</h4>
-                    <span className="text-sm text-slate-500">
-                      {selectedItems.length} von {selectedQuote.items.length} ausgewählt
-                    </span>
+                    <h4 className="font-semibold text-slate-800">{t('quotes.selectPositions')}</h4>
+                    <span className="text-sm text-slate-500">{t('quotes.selectedOf', { selected: selectedItems.length, total: selectedQuote.items.length })}</span>
                   </div>
-                  
                   <div className="border border-slate-200 rounded-xl overflow-hidden">
                     <table className="w-full">
                       <thead className="bg-slate-50 text-xs text-slate-500 uppercase">
                         <tr>
                           <th className="w-12 px-4 py-3"></th>
-                          <th className="text-left px-4 py-3">Beschreibung</th>
-                          <th className="text-right px-4 py-3">Menge</th>
-                          <th className="text-right px-4 py-3">Einzelpreis</th>
-                          <th className="text-right px-4 py-3">Gesamt</th>
+                          <th className="text-left px-4 py-3">{t('quotes.description')}</th>
+                          <th className="text-right px-4 py-3">{t('quotes.quantity')}</th>
+                          <th className="text-right px-4 py-3">{t('quotes.unitPrice')}</th>
+                          <th className="text-right px-4 py-3">{t('quotes.total')}</th>
                         </tr>
                       </thead>
                       <tbody>
                         {selectedQuote.items.map((item, idx) => (
-                          <tr 
-                            key={idx} 
-                            className={`border-t border-slate-100 transition-colors ${
-                              selectedItems.includes(idx) ? 'bg-blue-50/50' : 'hover:bg-slate-50'
-                            }`}
-                          >
-                            <td className="px-4 py-3">
-                              <Checkbox
-                                checked={selectedItems.includes(idx)}
-                                onCheckedChange={() => toggleItem(idx)}
-                              />
-                            </td>
-                            <td className={`px-4 py-3 ${selectedItems.includes(idx) ? 'text-slate-700 font-medium' : 'text-slate-500'}`}>
-                              {item.description}
-                            </td>
-                            <td className={`px-4 py-3 text-right ${selectedItems.includes(idx) ? 'text-slate-600' : 'text-slate-400'}`}>
-                              {item.quantity}
-                            </td>
-                            <td className={`px-4 py-3 text-right ${selectedItems.includes(idx) ? 'text-slate-600' : 'text-slate-400'}`}>
-                              {formatCurrency(item.unit_price)}
-                            </td>
-                            <td className={`px-4 py-3 text-right ${selectedItems.includes(idx) ? 'font-medium text-slate-800' : 'text-slate-400'}`}>
-                              {formatCurrency(item.total)}
-                            </td>
+                          <tr key={idx} className={`border-t border-slate-100 transition-colors ${selectedItems.includes(idx) ? 'bg-blue-50/50' : 'hover:bg-slate-50'}`}>
+                            <td className="px-4 py-3"><Checkbox checked={selectedItems.includes(idx)} onCheckedChange={() => toggleItem(idx)} /></td>
+                            <td className={`px-4 py-3 ${selectedItems.includes(idx) ? 'text-slate-700 font-medium' : 'text-slate-500'}`}>{item.description}</td>
+                            <td className={`px-4 py-3 text-right ${selectedItems.includes(idx) ? 'text-slate-600' : 'text-slate-400'}`}>{item.quantity}</td>
+                            <td className={`px-4 py-3 text-right ${selectedItems.includes(idx) ? 'text-slate-600' : 'text-slate-400'}`}>{formatCurrency(item.unit_price)}</td>
+                            <td className={`px-4 py-3 text-right ${selectedItems.includes(idx) ? 'font-medium text-slate-800' : 'text-slate-400'}`}>{formatCurrency(item.total)}</td>
                           </tr>
                         ))}
                       </tbody>
                       <tfoot className="bg-slate-50 border-t-2 border-slate-200">
                         <tr>
-                          <td colSpan="4" className="px-4 py-3 text-right font-semibold text-slate-700">
-                            Ausgewählte Summe:
-                          </td>
-                          <td className="px-4 py-3 text-right font-bold text-slate-900 text-lg">
-                            {formatCurrency(calculateSelectedTotal())}
-                          </td>
+                          <td colSpan="4" className="px-4 py-3 text-right font-semibold text-slate-700">{t('quotes.selectedTotal')}</td>
+                          <td className="px-4 py-3 text-right font-bold text-slate-900 text-lg">{formatCurrency(calculateSelectedTotal())}</td>
                         </tr>
                       </tfoot>
                     </table>
@@ -326,18 +213,12 @@ export default function Quotes() {
                     <div className="mt-4 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-semibold text-emerald-900 mb-1">Angebot annehmen</p>
-                          <p className="text-sm text-emerald-700">
-                            Sie akzeptieren {selectedItems.length} Position{selectedItems.length !== 1 ? 'en' : ''} im Gesamtwert von {formatCurrency(calculateSelectedTotal())}
-                          </p>
+                          <p className="font-semibold text-emerald-900 mb-1">{t('quotes.acceptQuote')}</p>
+                          <p className="text-sm text-emerald-700">{t('quotes.acceptText', { count: selectedItems.length, amount: formatCurrency(calculateSelectedTotal()) })}</p>
                         </div>
-                        <Button 
-                          onClick={handleAcceptQuote}
-                          disabled={selectedItems.length === 0}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                        >
+                        <Button onClick={handleAcceptQuote} disabled={selectedItems.length === 0} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                           <Check className="h-4 w-4 mr-2" />
-                          Jetzt annehmen
+                          {t('quotes.acceptNow')}
                         </Button>
                       </div>
                     </div>
@@ -349,51 +230,35 @@ export default function Quotes() {
                 <Button asChild className="w-full">
                   <a href={selectedQuote.file_url} target="_blank" rel="noopener noreferrer">
                     <Download className="h-4 w-4 mr-2" />
-                    Angebot herunterladen
+                    {t('quotes.download')}
                   </a>
                 </Button>
               )}
 
-              {/* Comments Section */}
               <div className="border-t border-slate-100 pt-6">
                 <h4 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
                   <MessageSquare className="h-4 w-4" />
-                  Kommentare
+                  {t('quotes.comments')}
                 </h4>
                 <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
                   {!selectedQuote.comments || selectedQuote.comments.length === 0 ? (
-                    <p className="text-slate-500 text-sm text-center py-4 bg-slate-50 rounded-lg">Noch keine Kommentare vorhanden</p>
+                    <p className="text-slate-500 text-sm text-center py-4 bg-slate-50 rounded-lg">{t('quotes.noComments')}</p>
                   ) : (
                     selectedQuote.comments.map((comment, idx) => (
                       <div key={idx} className="bg-slate-50 rounded-xl p-4">
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-medium text-slate-700">{comment.author}</span>
-                          <span className="text-xs text-slate-400">
-                            {comment.date && format(new Date(comment.date), 'dd.MM.yy HH:mm', { locale: de })}
-                          </span>
+                          <span className="text-xs text-slate-400">{comment.date && format(new Date(comment.date), 'dd.MM.yy HH:mm', { locale: de })}</span>
                         </div>
                         <p className="text-slate-600 text-sm whitespace-pre-wrap">{comment.message}</p>
                       </div>
                     ))
                   )}
                 </div>
-
-                <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-3 text-xs text-blue-800">
-                  Ihre Kommentare werden direkt an weclapp übermittelt und vom Support-Team bearbeitet.
-                </div>
-
+                <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-3 text-xs text-blue-800">{t('quotes.commentHint')}</div>
                 <div className="flex gap-2">
-                  <Textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Schreiben Sie hier Ihre Nachricht..."
-                    className="flex-1 min-h-[80px]"
-                  />
-                  <Button 
-                    onClick={handleAddComment}
-                    disabled={!newComment.trim() || addCommentMutation.isPending}
-                    className="self-end bg-[#1e3a5f] hover:bg-[#2d4a6f]"
-                  >
+                  <Textarea value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder={t('quotes.commentPlaceholder')} className="flex-1 min-h-[80px]" />
+                  <Button onClick={handleAddComment} disabled={!newComment.trim() || addCommentMutation.isPending} className="self-end bg-[#1e3a5f] hover:bg-[#2d4a6f]">
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
