@@ -181,10 +181,10 @@ export default function Layout({ children, currentPageName }) {
             </div>
             <div className="flex-1 min-w-0">
               <span className="font-semibold text-slate-800 block truncate">
-                {currentCustomer ? currentCustomer.company_name : 'Kundenportal'}
+                {currentCustomer ? currentCustomer.company_name : t('nav.portal')}
               </span>
               {currentCustomer && (
-                <span className="text-xs text-slate-500">Kundenansicht</span>
+                <span className="text-xs text-slate-500">{t('nav.customerView')}</span>
               )}
             </div>
           </div>
