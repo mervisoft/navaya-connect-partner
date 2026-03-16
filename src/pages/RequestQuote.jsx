@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useNavigate, Link } from 'react-router-dom';
@@ -19,7 +19,7 @@ export default function RequestQuote() {
   const [customerId, setCustomerId] = useState(null);
   const { t } = useTranslation();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlCustomerId = params.get('customerId');
     if (urlCustomerId) {
