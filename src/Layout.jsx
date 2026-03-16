@@ -57,6 +57,7 @@ export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [isCustomerView, setIsCustomerView] = useState(false);
   const [currentCustomer, setCurrentCustomer] = useState(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadUser = async () => {
