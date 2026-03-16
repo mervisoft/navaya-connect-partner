@@ -233,8 +233,8 @@ export default function Shop() {
       )}
 
       <PageHeader
-        title="Shop"
-        subtitle={customer ? `Produkte und Lizenzen für ${customer.company_name}` : "Produkte und Lizenzen für Ihre Kunden bestellen"}
+        title={t('shop.title')}
+        subtitle={customer ? t('shop.subtitleFor', { name: customer.company_name }) : t('shop.subtitle')}
         icon={Package}
         actions={
           <Sheet open={cartOpen} onOpenChange={setCartOpen}>
