@@ -92,6 +92,29 @@ export default function Shop() {
     return [...new Set(subs)].sort();
   }, [products, categoryFilter, productLineFilter]);
 
+  const isUpgradeFilterActive = subcategoryFilter === 'Upgrade';
+
+  const availableUpgradeFromVersions = useMemo(() => {
+    if (!isUpgradeFilterActive) return [];
+    const versions = products
+      .filter(p => p.subcategory === 'Upgrade')
+      .filter(p => productLineFilter === 'all' || p.product_line === productLineFilter)
+      .map(p => p.upgrade_from_version)
+      .filter(Boolean);
+    return [...new Set(versions)].sort();
+  }, [products, productLineFilter, isUpgradeFilterActive]);
+
+  const availableUpgradeToVersions = useMemo(() => {
+    if (!isUpgradeFilterActive) return [];
+    const versions = products
+      .filter(p => p.subcategory === 'Upgrade')
+      .filter(p => productLineFilter === 'all' || p.product_line === productLineFilter)
+      .filter(p => upgradeFromFilter === 'all' || p.upgrade_from_version === upgradeFromFilter)
+      .map(p => p.upgrade_to_version)
+      .filter(Boolean);
+    return [...new Set(versions)].sort();
+  }, [products, productLineFilter, isUpgradeFilterActive, upgradeFromFilter]);
+
   const filteredProducts = products.filter(product => {
     const matchesSearch = 
       product.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -100,7 +123,9 @@ export default function Shop() {
     const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
     const matchesLine = productLineFilter === 'all' || product.product_line === productLineFilter;
     const matchesSub = subcategoryFilter === 'all' || product.subcategory === subcategoryFilter;
-    return matchesSearch && matchesCategory && matchesLine && matchesSub;
+    const matchesFrom = upgradeFromFilter === 'all' || product.upgrade_from_version === upgradeFromFilter;
+    const matchesTo = upgradeToFilter === 'all' || product.upgrade_to_version === upgradeToFilter;
+    return matchesSearch && matchesCategory && matchesLine && matchesSub && matchesFrom && matchesTo;
   });
 
   const handleCategoryChange = (val) => {
