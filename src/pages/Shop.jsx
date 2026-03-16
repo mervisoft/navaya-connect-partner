@@ -137,6 +137,14 @@ export default function Shop() {
   const handleProductLineChange = (val) => {
     setProductLineFilter(val);
     setSubcategoryFilter('all');
+    setUpgradeFromFilter('all');
+    setUpgradeToFilter('all');
+  };
+
+  const handleSubcategoryChange = (val) => {
+    setSubcategoryFilter(val);
+    setUpgradeFromFilter('all');
+    setUpgradeToFilter('all');
   };
 
   const addToCart = (product) => {
