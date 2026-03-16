@@ -258,7 +258,7 @@ export default function Shop() {
                 {cart.length === 0 ? (
                   <div className="text-center py-12">
                     <ShoppingCart className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-                    <p className="text-slate-500">Ihr Warenkorb ist leer</p>
+                    <p className="text-slate-500">{t('shop.cartEmpty')}</p>
                   </div>
                 ) : (
                   <>
