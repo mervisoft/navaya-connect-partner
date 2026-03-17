@@ -21,11 +21,10 @@ Deno.serve(async (req) => {
 
         let url;
         if (customerId) {
-            // Fetch specific customer by ID
             url = `https://${subdomain}.weclapp.com/webapp/api/v1/customer/id/${customerId}`;
         } else {
-            // Fetch first customer to inspect schema
-            url = `https://${subdomain}.weclapp.com/webapp/api/v1/customer?pageSize=1`;
+            // Fetch attribute definitions to find dealer assignment field
+            url = `https://${subdomain}.weclapp.com/webapp/api/v1/customAttributeDefinition?pageSize=100&entityType=CUSTOMER`;
         }
 
         const controller = new AbortController();
