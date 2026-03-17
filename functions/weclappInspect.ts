@@ -11,7 +11,13 @@ Deno.serve(async (req) => {
         const subdomain = Deno.env.get("WECLAPP_SUBDOMAIN");
         const apiToken = Deno.env.get("WECLAPP_API_TOKEN");
 
-        const { customerId } = await req.json();
+        let customerId = null;
+        try {
+            const body = await req.json();
+            customerId = body.customerId;
+        } catch (_) {
+            // No body provided, customerId remains null
+        }
 
         let url;
         if (customerId) {
