@@ -20,8 +20,10 @@ Deno.serve(async (req) => {
         if (customerId) {
             url = `https://${subdomain}.weclapp.com/webapp/api/v1/customer/id/${customerId}`;
         } else if (partyId) {
-            // Look up a party/customer record by ID to get its name/details
             url = `https://${subdomain}.weclapp.com/webapp/api/v1/customer/id/${partyId}`;
+        } else if (mode === 'users') {
+            // List weclapp system users to understand user<->party mapping
+            url = `https://${subdomain}.weclapp.com/webapp/api/v1/user?pageSize=20`;
         } else {
             // Find customers that have the "Betreut von Händler(n)" field set
             url = `https://${subdomain}.weclapp.com/webapp/api/v1/customer?pageSize=5&customAttribute453613.entityId-isnotnull=true`;
