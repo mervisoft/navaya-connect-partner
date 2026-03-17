@@ -128,6 +128,16 @@ export const AuthProvider = ({ children }) => {
     base44.auth.redirectToLogin(window.location.href);
   };
 
+  const validatePartner = async (email) => {
+    try {
+      const response = await base44.functions.invoke('validatePartnerEmail', { email });
+      return response.data.isPartner;
+    } catch (error) {
+      console.error('Partner validation error:', error);
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
