@@ -62,7 +62,19 @@ Deno.serve(async (req) => {
         // Fetch all customers with the attribute set (may need pagination for large datasets)
         const url = `/customer?pageSize=250&page=1&customAttribute${WECLAPP_ATTR_ID}.entityId-isnotnull=true`;
         const data = await weclappFetch(subdomain, apiToken, url);
-        const customers = (data.result || []).map(c => ({
+        let results = data.result || [];
+
+        // Client-side filter by partyId if provided
+        if (partyId) {
+            results = results.filter(c => {
+                const attr = (c.customAttributes || []).find(a => a.attributeDefinitionId === WECLAPP_ATTR_ID);
+                if (!attr) return false;
+                const refs = attr.entityReferences || [];
+                return refs.some(r => r.entityId === String(partyId));
+            });
+        }
+
+        const customers = results.map(c => ({
             id: c.id,
             customerNumber: c.customerNumber,
             company: c.company,
