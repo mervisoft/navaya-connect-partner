@@ -31,6 +31,12 @@ const AuthenticatedApp = () => {
     );
   }
 
+  // If not authenticated, redirect to login
+  if (!isAuthenticated && !authError) {
+    navigateToLogin();
+    return null;
+  }
+
   // Handle authentication errors
   if (authError) {
     if (authError.type === 'user_not_registered') {
