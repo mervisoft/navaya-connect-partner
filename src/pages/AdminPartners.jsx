@@ -117,6 +117,68 @@ export default function AdminPartners() {
         title="Partner-Verwaltung"
         subtitle="Verwalte deine Partner und ihre Berechtigungen"
         icon={Users}
+        actions={
+          <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="h-4 w-4 mr-2" />
+                Partner einladen
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Neuen Partner einladen</DialogTitle>
+                <DialogDescription>
+                  Gib die E-Mail-Adresse des neuen Partners ein
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700 block mb-2">
+                    E-Mail-Adresse
+                  </label>
+                  <Input
+                    type="email"
+                    placeholder="partner@example.com"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    disabled={isInviting}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700 block mb-2">
+                    Rolle
+                  </label>
+                  <Select value={inviteRole} onValueChange={setInviteRole} disabled={isInviting}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">Partner</SelectItem>
+                      <SelectItem value="admin">Administrator</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex gap-3 justify-end pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsInviteDialogOpen(false)}
+                    disabled={isInviting}
+                  >
+                    Abbrechen
+                  </Button>
+                  <Button
+                    onClick={handleInvitePartner}
+                    disabled={isInviting}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    {isInviting ? 'Wird eingeladen...' : 'Einladen'}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        }
       />
 
       {error && (
