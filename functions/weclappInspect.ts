@@ -35,12 +35,19 @@ Deno.serve(async (req) => {
             }
         });
 
+        const responseText = await response.text();
+
         if (!response.ok) {
-            const errorText = await response.text();
-            return Response.json({ error: `Weclapp API error: ${response.status}`, details: errorText }, { status: 500 });
+            return Response.json({ error: `Weclapp API error: ${response.status}`, details: responseText }, { status: 500 });
         }
 
-        const data = await response.json();
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (_) {
+            return Response.json({ error: 'Could not parse response', raw: responseText });
+        }
+
         return Response.json({ success: true, data });
 
     } catch (error) {
