@@ -55,28 +55,15 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Could not parse response', raw: responseText });
         }
 
-        // If fetching attribute definitions, filter and summarize
+        // If fetching customers without ID, extract only relevant fields
         if (data.result && !customerId) {
-            const summary = data.result.map(attr => ({
-                id: attr.id,
-                label: attr.label,
-                attributeKey: attr.attributeKey,
-                attributeType: attr.attributeType,
-                entities: attr.entities,
-                groupName: attr.groupName,
-                description: attr.attributeDescription,
+            const simplified = data.result.map(c => ({
+                id: c.id,
+                company: c.company,
+                customerNumber: c.customerNumber,
+                customAttributes: c.customAttributes?.filter(a => a.attributeDefinitionId === '453613'),
             }));
-            // Filter for dealer/reseller related attributes
-            const dealerAttrs = summary.filter(a => 
-                (a.label || '').toLowerCase().includes('händ') ||
-                (a.label || '').toLowerCase().includes('dealer') ||
-                (a.label || '').toLowerCase().includes('partner') ||
-                (a.label || '').toLowerCase().includes('betreut') ||
-                (a.groupName || '').toLowerCase().includes('händ') ||
-                (a.groupName || '').toLowerCase().includes('partner') ||
-                (a.description || '').toLowerCase().includes('händ')
-            );
-            return Response.json({ success: true, allCount: data.result.length, dealerAttributes: dealerAttrs, allSummary: summary });
+            return Response.json({ success: true, count: data.result.length, customers: simplified });
         }
 
         return Response.json({ success: true, data });
