@@ -108,7 +108,7 @@ export default function Layout({ children, currentPageName }) {
     }
   }, [currentPageName]);
 
-  const navItems = isCustomerView ? getCustomerNavItems(t) : getResellerNavItems(t);
+  const navItems = isCustomerView ? getCustomerNavItems(t) : getResellerNavItems(t, user?.role === 'admin');
 
   const handleLogout = () => {
     localStorage.removeItem('activeCustomerId');
