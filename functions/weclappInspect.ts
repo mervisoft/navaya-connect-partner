@@ -11,23 +11,20 @@ Deno.serve(async (req) => {
         const subdomain = Deno.env.get("WECLAPP_SUBDOMAIN");
         const apiToken = Deno.env.get("WECLAPP_API_TOKEN");
 
-        let customerId = null;
-        try {
-            const body = await req.json();
-            customerId = body.customerId;
-        } catch (_) {
-            // No body provided, customerId remains null
-        }
+        let reqBody = {};
+        try { reqBody = await req.json(); } catch(_) {}
 
-        const body = (() => { try { return req._parsedBody; } catch(_) { return {}; } })();
+        const { customerId, partyId, mode } = reqBody;
 
         let url;
         if (customerId) {
             url = `https://${subdomain}.weclapp.com/webapp/api/v1/customer/id/${customerId}`;
+        } else if (partyId) {
+            // Look up a party/customer record by ID to get its name/details
+            url = `https://${subdomain}.weclapp.com/webapp/api/v1/customer/id/${partyId}`;
         } else {
-            // Find customers that have the "Betreut von Händler(n)" field set (attributeDefinitionId 453613)
-            // Filter: customAttribute453613.entityReferences is not empty
-            url = `https://mervisoft.weclapp.com/webapp/api/v1/customer?pageSize=5&customAttribute453613.entityId-isnotnull=true`;
+            // Find customers that have the "Betreut von Händler(n)" field set
+            url = `https://${subdomain}.weclapp.com/webapp/api/v1/customer?pageSize=5&customAttribute453613.entityId-isnotnull=true`;
         }
 
         const controller = new AbortController();
