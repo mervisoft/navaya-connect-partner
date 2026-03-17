@@ -47,7 +47,7 @@ export default function AdminPartners() {
     loadUser();
   }, []);
 
-  const { data: allUsers = [], isLoading, error } = useQuery({
+  const { data: allUsers = [], isLoading, error, refetch } = useQuery({
     queryKey: ['allUsers'],
     queryFn: async () => {
       try {
@@ -58,6 +58,27 @@ export default function AdminPartners() {
       }
     },
   });
+
+  const handleInvitePartner = async () => {
+    if (!inviteEmail.trim()) {
+      alert('Bitte gib eine E-Mail-Adresse ein');
+      return;
+    }
+
+    setIsInviting(true);
+    try {
+      await base44.users.inviteUser(inviteEmail.trim(), inviteRole);
+      setInviteEmail('');
+      setInviteRole('user');
+      setIsInviteDialogOpen(false);
+      refetch();
+      alert('Partner erfolgreich eingeladen!');
+    } catch (e) {
+      alert('Fehler beim Einladen: ' + e.message);
+    } finally {
+      setIsInviting(false);
+    }
+  };
 
   // Check if current user is admin
   if (user && user.role !== 'admin') {
