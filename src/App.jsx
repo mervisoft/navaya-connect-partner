@@ -51,7 +51,8 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
-    <Routes>
+    <PartnerValidationCheck>
+      <Routes>
       <Route path="/" element={
         <LayoutWrapper currentPageName={mainPageKey}>
           <MainPage />
