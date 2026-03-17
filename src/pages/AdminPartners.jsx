@@ -42,6 +42,7 @@ export default function AdminPartners() {
         setUser(userData);
       } catch (e) {
         console.log('Not logged in');
+        base44.auth.redirectToLogin('/AdminPartners');
       }
     };
     loadUser();
