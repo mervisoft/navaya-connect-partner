@@ -78,14 +78,12 @@ const AuthenticatedApp = () => {
         }
       />
       <Route path="*" element={<PageNotFound />} />
-      </Routes>
+    </Routes>
     </PartnerValidationCheck>
   );
 };
 
-
 function App() {
-
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
