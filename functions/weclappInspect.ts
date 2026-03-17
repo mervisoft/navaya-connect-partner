@@ -23,8 +23,8 @@ Deno.serve(async (req) => {
         if (customerId) {
             url = `https://${subdomain}.weclapp.com/webapp/api/v1/customer/id/${customerId}`;
         } else {
-            // Fetch attribute definitions to find dealer assignment field
-            url = `https://${subdomain}.weclapp.com/webapp/api/v1/customAttributeDefinition?pageSize=100&entityType=CUSTOMER`;
+            // Fetch ALL attribute definitions, then filter for dealer/händler related ones
+            url = `https://${subdomain}.weclapp.com/webapp/api/v1/customAttributeDefinition?pageSize=200`;
         }
 
         const controller = new AbortController();
