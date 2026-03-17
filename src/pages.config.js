@@ -54,10 +54,12 @@ import CustomerView from './pages/CustomerView';
 import Customers from './pages/Customers';
 import Dashboard from './pages/Dashboard';
 import Deliveries from './pages/Deliveries';
+import DesignGuide from './pages/DesignGuide';
 import Documents from './pages/Documents';
 import FAQ from './pages/FAQ';
 import Home from './pages/Home';
 import Invoices from './pages/Invoices';
+import LicenseExtension from './pages/LicenseExtension';
 import NewCustomer from './pages/NewCustomer';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Orders from './pages/Orders';
@@ -68,8 +70,7 @@ import RequestQuote from './pages/RequestQuote';
 import ResellerDashboard from './pages/ResellerDashboard';
 import Shop from './pages/Shop';
 import Tickets from './pages/Tickets';
-import LicenseExtension from './pages/LicenseExtension';
-import DesignGuide from './pages/DesignGuide';
+import AdminPartners from './pages/AdminPartners';
 import __Layout from './Layout.jsx';
 
 
@@ -81,10 +82,12 @@ export const PAGES = {
     "Customers": Customers,
     "Dashboard": Dashboard,
     "Deliveries": Deliveries,
+    "DesignGuide": DesignGuide,
     "Documents": Documents,
     "FAQ": FAQ,
     "Home": Home,
     "Invoices": Invoices,
+    "LicenseExtension": LicenseExtension,
     "NewCustomer": NewCustomer,
     "OrderConfirmation": OrderConfirmation,
     "Orders": Orders,
@@ -95,8 +98,7 @@ export const PAGES = {
     "ResellerDashboard": ResellerDashboard,
     "Shop": Shop,
     "Tickets": Tickets,
-    "LicenseExtension": LicenseExtension,
-    "DesignGuide": DesignGuide,
+    "AdminPartners": AdminPartners,
 }
 
 export const pagesConfig = {

@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import PageHeader from '@/components/shared/PageHeader';
-import { Users, Shield, Mail, Calendar } from 'lucide-react';
+import { Users, Shield, Mail, Calendar, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useState as useStateHook } from 'react';
 import {
   Select,
   SelectContent,
