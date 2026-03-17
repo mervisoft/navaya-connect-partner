@@ -30,6 +30,10 @@ export default function AdminPartners() {
   const [filterRole, setFilterRole] = useState('all');
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('user');
+  const [isInviting, setIsInviting] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
