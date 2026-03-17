@@ -54,19 +54,13 @@ Deno.serve(async (req) => {
         }
 
         // --- MODE: customers (default) ---
-        // Return all customers assigned to the given partyId (via customAttribute 453613)
-        // If user is admin and no partyId given → return all customers with this attribute set
-        const offset = (page - 1) * pageSize;
-        let url;
-        if (partyId) {
-            // Filter: customAttribute453613.entityId equals partyId
-            url = `/customer?pageSize=${pageSize}&page=${page}&customAttribute${WECLAPP_ATTR_ID}.entityId-eq=${partyId}`;
-        } else if (user.role === 'admin') {
-            url = `/customer?pageSize=${pageSize}&page=${page}&customAttribute${WECLAPP_ATTR_ID}.entityId-isnotnull=true`;
-        } else {
+        // Fetch all customers that have the dealer attribute set, then filter client-side by partyId
+        if (!partyId && user.role !== 'admin') {
             return Response.json({ success: false, error: 'No partyId provided and user is not admin' }, { status: 403 });
         }
 
+        // Fetch all customers with the attribute set (may need pagination for large datasets)
+        const url = `/customer?pageSize=250&page=1&customAttribute${WECLAPP_ATTR_ID}.entityId-isnotnull=true`;
         const data = await weclappFetch(subdomain, apiToken, url);
         const customers = (data.result || []).map(c => ({
             id: c.id,
