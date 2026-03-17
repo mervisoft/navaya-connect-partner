@@ -19,12 +19,15 @@ Deno.serve(async (req) => {
             // No body provided, customerId remains null
         }
 
+        const body = (() => { try { return req._parsedBody; } catch(_) { return {}; } })();
+
         let url;
         if (customerId) {
             url = `https://${subdomain}.weclapp.com/webapp/api/v1/customer/id/${customerId}`;
         } else {
-            // Fetch ALL attribute definitions, then filter for dealer/händler related ones
-            url = `https://${subdomain}.weclapp.com/webapp/api/v1/customAttributeDefinition?pageSize=200`;
+            // Find customers that have the "Betreut von Händler(n)" field set (attributeDefinitionId 453613)
+            // Filter: customAttribute453613.entityReferences is not empty
+            url = `https://mervisoft.weclapp.com/webapp/api/v1/customer?pageSize=5&customAttribute453613.entityId-isnotnull=true`;
         }
 
         const controller = new AbortController();
