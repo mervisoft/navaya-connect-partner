@@ -148,7 +148,8 @@ export const AuthProvider = ({ children }) => {
       appPublicSettings,
       logout,
       navigateToLogin,
-      checkAppState
+      checkAppState,
+      validatePartner
     }}>
       {children}
     </AuthContext.Provider>
