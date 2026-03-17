@@ -161,6 +161,28 @@ export default function Layout({ children, currentPageName }) {
               </Link>
             </Button>
             <LanguageSwitcher />
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="text-sm">{user.full_name || user.email}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to={createPageUrl('Profile')} className="cursor-pointer">
+                      <User className="h-4 w-4 mr-2" />
+                      {t('nav.editProfile')}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    {t('nav.logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </header>
