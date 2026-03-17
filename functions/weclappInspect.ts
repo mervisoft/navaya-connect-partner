@@ -54,8 +54,20 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Could not parse response', raw: responseText });
         }
 
-        // If fetching customers without ID, extract only relevant fields
-        if (data.result && !customerId) {
+        // If fetching users (mode=users), return raw but simplified
+        if (data.result && !customerId && !partyId) {
+            if (mode === 'users') {
+                const users = data.result.map(u => ({
+                    id: u.id,
+                    email: u.email,
+                    username: u.username,
+                    firstName: u.firstName,
+                    lastName: u.lastName,
+                    partyId: u.partyId,
+                    active: u.active,
+                }));
+                return Response.json({ success: true, count: users.length, users });
+            }
             const simplified = data.result.map(c => ({
                 id: c.id,
                 company: c.company,
