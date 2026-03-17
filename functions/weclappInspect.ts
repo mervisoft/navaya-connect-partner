@@ -28,12 +28,17 @@ Deno.serve(async (req) => {
             url = `https://${subdomain}.weclapp.com/webapp/api/v1/customer?pageSize=1`;
         }
 
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+
         const response = await fetch(url, {
             headers: {
                 'AuthenticationToken': apiToken,
                 'Content-Type': 'application/json',
-            }
+            },
+            signal: controller.signal
         });
+        clearTimeout(timeout);
 
         const responseText = await response.text();
 
