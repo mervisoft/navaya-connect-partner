@@ -33,10 +33,10 @@ Deno.serve(async (req) => {
         const { mode, email, partyId, page = 1, pageSize = 100 } = reqBody;
 
         // --- MODE: resolve --- 
-        // Given a user email, find the matching weclapp customer/contact and return partyId
+        // Given a user email, find the matching weclapp customer and return partyId
         if (mode === 'resolve') {
             const targetEmail = email || user.email;
-            // Search for a customer where the primary email matches
+            // Search by email in customer list
             const data = await weclappFetch(subdomain, apiToken,
                 `/customer?email=${encodeURIComponent(targetEmail)}&pageSize=5`
             );
@@ -48,22 +48,6 @@ Deno.serve(async (req) => {
                     partyId: match.id,
                     company: match.company,
                     customerNumber: match.customerNumber,
-                });
-            }
-            // Also try searching contacts
-            const contactData = await weclappFetch(subdomain, apiToken,
-                `/contact?email=${encodeURIComponent(targetEmail)}&pageSize=5`
-            );
-            const contactMatches = (contactData.result || []);
-            if (contactMatches.length > 0) {
-                const contact = contactMatches[0];
-                // The contact belongs to a party - use its partyId or id
-                const pid = contact.partyId || contact.id;
-                return Response.json({
-                    success: true,
-                    partyId: pid,
-                    company: contact.company || contact.personCompany,
-                    fromContact: true,
                 });
             }
             return Response.json({ success: false, partyId: null, message: 'No weclapp customer found for this email' });
