@@ -78,7 +78,8 @@ const AuthenticatedApp = () => {
         }
       />
       <Route path="*" element={<PageNotFound />} />
-    </Routes>
+      </Routes>
+    </PartnerValidationCheck>
   );
 };
 
