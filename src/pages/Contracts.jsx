@@ -154,6 +154,52 @@ export default function Contracts() {
                 </div>
               </div>
 
+              {selectedContract.product_line && (
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="bg-slate-50 rounded-xl p-4">
+                    <p className="text-xs text-slate-500 mb-1">Produkt</p>
+                    <p className="font-semibold text-slate-800">{selectedContract.product_line}</p>
+                  </div>
+                  {selectedContract.edition && (
+                    <div className="bg-slate-50 rounded-xl p-4">
+                      <p className="text-xs text-slate-500 mb-1">Edition</p>
+                      <p className="font-semibold text-slate-800">{selectedContract.edition}</p>
+                    </div>
+                  )}
+                  {selectedContract.seats && (
+                    <div className="bg-slate-50 rounded-xl p-4">
+                      <p className="text-xs text-slate-500 mb-1">Seats</p>
+                      <p className="font-semibold text-slate-800">{selectedContract.seats}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {selectedContract.serial_numbers?.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Hash className="h-4 w-4 text-slate-500" />
+                    <h4 className="font-semibold text-slate-700">Seriennummern ({selectedContract.serial_numbers.length})</h4>
+                  </div>
+                  <div className="space-y-2">
+                    {selectedContract.serial_numbers.map((sn, idx) => (
+                      <div key={idx} className="flex items-center justify-between bg-slate-50 rounded-lg px-4 py-3 border border-slate-100">
+                        <div className="flex items-center gap-3">
+                          <Monitor className="h-4 w-4 text-slate-400" />
+                          <div>
+                            <p className="font-mono text-sm font-semibold text-slate-800 tracking-wide">{sn.serial}</p>
+                            {sn.seat_name && <p className="text-xs text-slate-500">{sn.seat_name}</p>}
+                          </div>
+                        </div>
+                        <span className={`text-xs font-medium px-2 py-1 rounded-full ${sn.status === 'aktiv' ? 'bg-emerald-100 text-emerald-700' : sn.status === 'gesperrt' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-500'}`}>
+                          {sn.status === 'aktiv' ? 'Aktiv' : sn.status === 'gesperrt' ? 'Gesperrt' : 'Abgelaufen'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {selectedContract.file_url && (
                 <Button asChild className="w-full">
                   <a href={selectedContract.file_url} target="_blank" rel="noopener noreferrer">
