@@ -28,7 +28,9 @@ Deno.serve(async (req) => {
     });
 
     if (!response.ok) {
-      return Response.json({ error: 'Failed to query Weclapp' }, { status: 500 });
+      const errorText = await response.text();
+      console.error('Weclapp error:', response.status, errorText);
+      return Response.json({ error: `Weclapp error ${response.status}: ${errorText}` }, { status: 500 });
     }
 
     const data = await response.json();
