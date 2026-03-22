@@ -32,7 +32,7 @@ import {
 const getResellerNavItems = (t, isAdmin) => [
   { name: t('nav.dashboard'), icon: LayoutDashboard, page: 'ResellerDashboard' },
   { name: t('nav.customers'), icon: User, page: 'Customers' },
-  ...(isAdmin ? [{ name: 'Partner-Verwaltung', icon: User, page: 'AdminPartners' }] : []),
+  // ...(isAdmin ? [{ name: 'Partner-Verwaltung', icon: User, page: 'AdminPartners' }] : []),
 ];
 
 const getCustomerNavItems = (t) => {
