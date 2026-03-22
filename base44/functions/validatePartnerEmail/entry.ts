@@ -16,8 +16,8 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing Weclapp credentials' }, { status: 500 });
     }
 
-    // Search for systemUser by email in Weclapp
-    const searchUrl = `https://${subdomain}.weclapp.com/webapp/api/v1/systemUser?pageSize=100`;
+    // Search for a customer with this email that has the partner attribute set
+    const searchUrl = `https://${subdomain}.weclapp.com/webapp/api/v1/customer?email=${encodeURIComponent(user.email)}&pageSize=5`;
     
     const response = await fetch(searchUrl, {
       method: 'GET',
@@ -34,16 +34,15 @@ Deno.serve(async (req) => {
     }
 
     const data = await response.json();
-    const systemUsers = data.result || [];
+    const customers = data.result || [];
 
-    // Check if the user's email exists as a partner/handler
-    const userExists = systemUsers.some(su => 
-      su.email && su.email.toLowerCase() === user.email.toLowerCase()
-    );
+    // User is a valid partner if they exist as a customer in Weclapp
+    const isPartner = customers.length > 0;
 
     return Response.json({ 
-      isPartner: userExists,
-      email: user.email
+      isPartner,
+      email: user.email,
+      found: customers.length
     });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
