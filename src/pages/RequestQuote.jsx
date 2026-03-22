@@ -268,7 +268,7 @@ export default function RequestQuote() {
                       </div>
                     </div>
                   </div>
-                ))}
+                  ))}
               </div>
             </div>
           </div>
