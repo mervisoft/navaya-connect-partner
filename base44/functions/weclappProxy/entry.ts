@@ -30,7 +30,35 @@ Deno.serve(async (req) => {
         let reqBody = {};
         try { reqBody = await req.json(); } catch(_) {}
 
-        const { mode, email, partyId, page = 1, pageSize = 100 } = reqBody;
+        const { mode, email, partyId, weclappId, page = 1, pageSize = 100 } = reqBody;
+
+        // --- MODE: single customer by weclappId ---
+        if (mode === 'customer' && weclappId) {
+            const data = await weclappFetch(subdomain, apiToken, `/customer/id/${weclappId}`);
+            const c = data;
+            return Response.json({
+                success: true,
+                customer: {
+                    id: c.id,
+                    customerNumber: c.customerNumber,
+                    company: c.company,
+                    email: c.email,
+                    phone: c.phone,
+                    website: c.website,
+                    city: c.addresses?.find(a => a.primeAddress)?.city || '',
+                    street: c.addresses?.find(a => a.primeAddress)?.street1 || '',
+                    zipcode: c.addresses?.find(a => a.primeAddress)?.zipcode || '',
+                    countryCode: c.addresses?.find(a => a.primeAddress)?.countryCode || '',
+                    contacts: (c.contacts || []).map(ct => ({
+                        id: ct.id,
+                        firstName: ct.firstName,
+                        lastName: ct.lastName,
+                        email: ct.email,
+                        phone: ct.phone,
+                    })),
+                }
+            });
+        }
 
         // --- MODE: resolve --- 
         // Given a user email, find the matching weclapp customer and return partyId
