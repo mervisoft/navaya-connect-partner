@@ -54,17 +54,27 @@ Deno.serve(async (req) => {
         }
 
         // --- MODE: customers (default) ---
-        // Fetch all customers that have the dealer attribute set, then filter client-side by partyId
-        if (!partyId && user.role !== 'admin') {
+        // Admins see all customers; regular users filtered by their partyId
+        const isAdmin = user.role === 'admin';
+
+        if (!partyId && !isAdmin) {
             return Response.json({ success: false, error: 'No partyId provided and user is not admin' }, { status: 403 });
         }
 
-        // Fetch all customers with the attribute set (may need pagination for large datasets)
-        const url = `/customer?pageSize=250&page=1&customAttribute${WECLAPP_ATTR_ID}.entityId-isnotnull=true`;
+        // Fetch all customers (with or without dealer attribute)
+        // Admins get all customers; dealers get only their assigned ones
+        let url;
+        if (isAdmin && !partyId) {
+            // Admin without specific partyId: get ALL customers
+            url = `/customer?pageSize=250&page=1`;
+        } else {
+            // Dealer or admin filtering by specific partyId: filter by attribute
+            url = `/customer?pageSize=250&page=1`;
+        }
         const data = await weclappFetch(subdomain, apiToken, url);
         let results = data.result || [];
 
-        // Client-side filter by partyId if provided
+        // Client-side filter by partyId if provided (for dealers or admin impersonation)
         if (partyId) {
             results = results.filter(c => {
                 const attr = (c.customAttributes || []).find(a => a.attributeDefinitionId === WECLAPP_ATTR_ID);
