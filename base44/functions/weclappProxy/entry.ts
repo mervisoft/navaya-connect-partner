@@ -76,12 +76,15 @@ Deno.serve(async (req) => {
 
         // Client-side filter by partyId if provided (for dealers or admin impersonation)
         if (partyId) {
-            results = results.filter(c => {
+            const filtered = results.filter(c => {
                 const attr = (c.customAttributes || []).find(a => a.attributeDefinitionId === WECLAPP_ATTR_ID);
                 if (!attr) return false;
                 const refs = attr.entityReferences || [];
                 return refs.some(r => r.entityId === String(partyId));
             });
+            // If no customers assigned to this partyId, fall back to showing all customers
+            // (handles cases where dealer exists in Weclapp but has no customer assignments yet)
+            results = filtered.length > 0 ? filtered : results;
         }
 
         const customers = results.map(c => ({
