@@ -97,7 +97,7 @@ export default function Contracts() {
       )}
 
       <Dialog open={!!selectedContract} onOpenChange={() => setSelectedContract(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
