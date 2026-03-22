@@ -216,15 +216,43 @@ export default function RequestQuote() {
       {showProductSelector && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-slate-200">
+            <div className="p-6 border-b border-slate-200 space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-slate-800">{t('requestQuote.selectProduct')}</h3>
-                <Button variant="ghost" size="sm" onClick={() => setShowProductSelector(false)}><ArrowLeft className="h-4 w-4 mr-2" />{t('requestQuote.back')}</Button>
+                <Button variant="ghost" size="sm" onClick={() => { setShowProductSelector(false); setProductSearch(''); setProductCategory('alle'); }}><ArrowLeft className="h-4 w-4 mr-2" />{t('requestQuote.back')}</Button>
+              </div>
+              <div className="flex gap-3">
+                <Input
+                  placeholder="Produkt suchen..."
+                  value={productSearch}
+                  onChange={(e) => setProductSearch(e.target.value)}
+                  className="flex-1"
+                  autoFocus
+                />
+                <Select value={productCategory} onValueChange={setProductCategory}>
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder="Kategorie" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="alle">Alle Kategorien</SelectItem>
+                    <SelectItem value="Software">Software</SelectItem>
+                    <SelectItem value="Hardware">Hardware</SelectItem>
+                    <SelectItem value="Lizenzen">Lizenzen</SelectItem>
+                    <SelectItem value="Services">Services</SelectItem>
+                    <SelectItem value="Zubehör">Zubehör</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="p-6 overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {products.map(product => (
+                {products
+                  .filter(p => {
+                    const matchSearch = productSearch === '' || p.name.toLowerCase().includes(productSearch.toLowerCase()) || (p.manufacturer || '').toLowerCase().includes(productSearch.toLowerCase());
+                    const matchCategory = productCategory === 'alle' || p.category === productCategory;
+                    return matchSearch && matchCategory;
+                  })
+                  .map(product => (
                   <div key={product.id} onClick={() => addProductToItem(product, selectedItemIndex)} className="bg-slate-50 rounded-xl p-4 hover:bg-slate-100 cursor-pointer transition-colors border-2 border-transparent hover:border-[#1e3a5f]">
                     <div className="flex items-start gap-4">
                       <div className="w-16 h-16 bg-slate-200 rounded-lg flex items-center justify-center flex-shrink-0">
