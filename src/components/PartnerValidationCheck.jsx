@@ -9,7 +9,14 @@ export default function PartnerValidationCheck({ children }) {
   useEffect(() => {
     const checkPartner = async () => {
       if (isAuthenticated && user?.email) {
-        const isPartner = await validatePartner(user.email);
+        let isPartner = true; // default to allow on error
+        try {
+          isPartner = await validatePartner(user.email);
+        } catch (e) {
+          console.warn('Partner validation failed, allowing access:', e);
+          setIsValidated(true);
+          return;
+        }
         setIsValidated(isPartner);
         
         if (!isPartner) {

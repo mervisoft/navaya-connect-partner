@@ -24,8 +24,7 @@ Deno.serve(async (req) => {
       headers: {
         'Authorization': `Bearer ${apiToken}`,
         'Content-Type': 'application/json'
-      },
-      timeout: 8000
+      }
     });
 
     if (!response.ok) {
