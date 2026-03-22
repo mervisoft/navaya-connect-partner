@@ -34,6 +34,8 @@ export default function RequestQuote() {
   const [formData, setFormData] = useState({ customer_id: '', title: '', notes: '', items: [] });
   const [showProductSelector, setShowProductSelector] = useState(false);
   const [selectedItemIndex, setSelectedItemIndex] = useState(null);
+  const [productSearch, setProductSearch] = useState('');
+  const [productCategory, setProductCategory] = useState('alle');
 
   const { data: products = [] } = useQuery({ queryKey: ['products'], queryFn: () => base44.entities.Product.list() });
 
