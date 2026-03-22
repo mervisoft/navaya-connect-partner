@@ -33,8 +33,25 @@ export default function CustomerView() {
     }
   }, []);
 
-  const { data: customers = [], isLoading: loadingCustomers } = useQuery({ queryKey: ['customers'], queryFn: () => base44.entities.Customer.list(), enabled: !!customerId });
-  const customer = customers.find(c => c.id === customerId);
+  const { data: weclappCustomerData, isLoading: loadingCustomers } = useQuery({
+    queryKey: ['weclapp-customer', customerId],
+    enabled: !!customerId,
+    queryFn: async () => {
+      const response = await base44.functions.invoke('weclappProxy', { mode: 'customer', weclappId: customerId });
+      return response.data?.customer || null;
+    }
+  });
+
+  // Map weclapp customer to the shape used in the template
+  const customer = weclappCustomerData ? {
+    ...weclappCustomerData,
+    company_name: weclappCustomerData.company,
+    contact_person: weclappCustomerData.contacts?.[0] ? `${weclappCustomerData.contacts[0].firstName || ''} ${weclappCustomerData.contacts[0].lastName || ''}`.trim() : '',
+    address: weclappCustomerData.street,
+    postal_code: weclappCustomerData.zipcode,
+    total_revenue: null,
+    notes: null,
+  } : null;
 
   const { data: quotes = [] } = useQuery({ queryKey: ['quotes'], queryFn: () => base44.entities.Quote.list('-created_date', 5), enabled: !!customerId });
   const { data: orders = [] } = useQuery({ queryKey: ['orders'], queryFn: () => base44.entities.Order.list('-created_date', 5), enabled: !!customerId });
