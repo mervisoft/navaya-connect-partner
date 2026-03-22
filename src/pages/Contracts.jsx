@@ -111,7 +111,7 @@ export default function Contracts() {
           </DialogHeader>
 
           {selectedContract && (
-            <div className="space-y-6 mt-4">
+            <div className="space-y-6 mt-4 overflow-y-auto flex-1 pr-1">
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-50 rounded-xl p-4">
                   <p className="text-xs text-slate-500 mb-1">{t('common.status')}</p>
