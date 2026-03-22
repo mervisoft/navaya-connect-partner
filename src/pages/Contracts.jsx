@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { FileCheck, Download, Search, Filter, Calendar, RefreshCw } from 'lucide-react';
+import { FileCheck, Download, Search, Filter, Calendar, RefreshCw, Hash, Monitor } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
