@@ -24,7 +24,7 @@ export default function CustomerView() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const urlCustomerId = params.get('id');
+    const urlCustomerId = params.get('id') || params.get('weclappId');
     const storedCustomerId = localStorage.getItem('activeCustomerId');
     const id = urlCustomerId || storedCustomerId;
     if (id) {
