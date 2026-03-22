@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
     const response = await fetch(searchUrl, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${apiToken}`,
+        'AuthenticationToken': apiToken,
         'Content-Type': 'application/json'
       }
     });
