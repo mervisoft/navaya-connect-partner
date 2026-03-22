@@ -134,7 +134,8 @@ export const AuthProvider = ({ children }) => {
       return response.data.isPartner;
     } catch (error) {
       console.error('Partner validation error:', error);
-      return false;
+      // On API error, allow access (don't block user due to backend issues)
+      return true;
     }
   };
 
