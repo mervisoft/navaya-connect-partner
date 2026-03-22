@@ -56,6 +56,11 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Could not parse response', raw: responseText });
         }
 
+        // If path provided, return raw data directly
+        if (path) {
+            return Response.json({ success: true, raw: data });
+        }
+
         // If fetching users (mode=users), return raw but simplified
         if (data.result && !customerId && !partyId) {
             if (mode === 'users') {
