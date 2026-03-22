@@ -208,6 +208,12 @@ export default function Contracts() {
                   </a>
                 </Button>
               )}
+
+              {selectedContract.status === 'aktiv' && (
+                <Button variant="destructive" className="w-full">
+                  Vertrag kündigen
+                </Button>
+              )}
             </div>
           )}
         </DialogContent>
