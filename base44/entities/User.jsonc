@@ -1,0 +1,21 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "partner"
+      ],
+      "default": "partner"
+    },
+    "weclapp_party_id": {
+      "type": "string",
+      "description": "Weclapp Party-ID des H\u00e4ndlers (wird automatisch per Email-Lookup gesetzt)"
+    }
+  },
+  "required": [
+    "weclapp_party_id"
+  ]
+}

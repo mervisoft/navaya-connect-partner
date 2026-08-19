@@ -1,0 +1,61 @@
+{
+  "name": "Customer",
+  "type": "object",
+  "properties": {
+    "company_name": {
+      "type": "string",
+      "description": "Firmenname des Kunden"
+    },
+    "contact_person": {
+      "type": "string",
+      "description": "Ansprechpartner"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "postal_code": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string",
+      "default": "Deutschland"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "aktiv",
+        "inaktiv",
+        "potentiell"
+      ],
+      "default": "aktiv"
+    },
+    "customer_number": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "total_revenue": {
+      "type": "number",
+      "description": "Gesamtumsatz"
+    },
+    "last_order_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "company_name",
+    "email"
+  ]
+}

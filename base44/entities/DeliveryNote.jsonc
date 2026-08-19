@@ -1,0 +1,52 @@
+{
+  "name": "DeliveryNote",
+  "type": "object",
+  "properties": {
+    "delivery_number": {
+      "type": "string",
+      "description": "Lieferscheinnummer"
+    },
+    "order_number": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "in_vorbereitung",
+        "versendet",
+        "zugestellt"
+      ],
+      "default": "in_vorbereitung"
+    },
+    "shipping_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "tracking_number": {
+      "type": "string"
+    },
+    "carrier": {
+      "type": "string"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "file_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "delivery_number"
+  ]
+}

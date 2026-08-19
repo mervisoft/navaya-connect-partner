@@ -1,0 +1,33 @@
+{
+  "name": "Document",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "vertrag",
+        "agb",
+        "preisliste",
+        "handbuch",
+        "sonstiges"
+      ],
+      "default": "sonstiges"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "file_size": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "file_url"
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "name": "Product",
+  "type": "object",
+  "properties": {
+    "product_number": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Software",
+        "Hardware",
+        "Lizenzen",
+        "Services",
+        "Zubeh\u00f6r"
+      ],
+      "description": "Hauptkategorie"
+    },
+    "product_line": {
+      "type": "string",
+      "description": "Produktlinie / Hersteller-Produkt (z.B. BricsCAD, AutoCAD, Windows)"
+    },
+    "subcategory": {
+      "type": "string",
+      "enum": [
+        "Vollizenz",
+        "Upgrade",
+        "Wartung",
+        "Mietlizenz",
+        "Add-on",
+        "Bundle",
+        "Sonstiges"
+      ],
+      "description": "Lizenztyp / Unterkategorie"
+    },
+    "upgrade_from_version": {
+      "type": "string",
+      "description": "Upgrade von Version (z.B. V22, V23) \u2013 nur f\u00fcr Upgrade-Produkte"
+    },
+    "upgrade_to_version": {
+      "type": "string",
+      "description": "Upgrade auf Version (z.B. V25) \u2013 nur f\u00fcr Upgrade-Produkte"
+    },
+    "manufacturer": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number"
+    },
+    "list_price": {
+      "type": "number",
+      "description": "Listenpreis (UVP)"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "stock": {
+      "type": "number",
+      "default": 0
+    },
+    "availability": {
+      "type": "string",
+      "enum": [
+        "Auf Lager",
+        "2-3 Tage",
+        "1-2 Wochen",
+        "Auf Anfrage"
+      ],
+      "default": "Auf Lager"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "name",
+    "price"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "name": "Ticket",
+  "type": "object",
+  "properties": {
+    "ticket_number": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "offen",
+        "in_bearbeitung",
+        "wartend",
+        "geschlossen"
+      ],
+      "default": "offen"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "niedrig",
+        "mittel",
+        "hoch",
+        "kritisch"
+      ],
+      "default": "mittel"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "technisch",
+        "abrechnung",
+        "allgemein",
+        "produktanfrage"
+      ],
+      "default": "allgemein"
+    },
+    "comments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "author": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "is_internal": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "subject",
+    "description"
+  ]
+}
