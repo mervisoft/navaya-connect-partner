@@ -16,6 +16,31 @@ async function weclappFetch(subdomain, apiToken, path) {
     return response.json();
 }
 
+function isAssignedTo(c, partyId) {
+    if (!partyId) return false;
+    const attr = (c.customAttributes || []).find(a => a.attributeDefinitionId === WECLAPP_ATTR_ID);
+    if (!attr) return false;
+    return (attr.entityReferences || []).some(r => r.entityId === String(partyId))
+        || String(attr.selectedValueId || '') === String(partyId);
+}
+
+// Server-side ermittelte Party-ID des eingeloggten Nutzers (nie vom Client uebernommen).
+async function getOwnPartyId(base44, user, subdomain, apiToken) {
+    if (user.weclapp_party_id) return String(user.weclapp_party_id);
+    if (!user.email) return null;
+    const data = await weclappFetch(subdomain, apiToken,
+        `/customer?email=${encodeURIComponent(user.email)}&pageSize=5`
+    );
+    const match = (data.result || [])[0];
+    if (!match) return null;
+    try {
+        await base44.asServiceRole.entities.User.update(user.id, { weclapp_party_id: String(match.id) });
+    } catch (e) {
+        console.error('Could not persist weclapp_party_id', e?.message);
+    }
+    return String(match.id);
+}
+
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
@@ -30,12 +55,20 @@ Deno.serve(async (req) => {
         let reqBody = {};
         try { reqBody = await req.json(); } catch(_) {}
 
-        const { mode, email, partyId, weclappId, page = 1, pageSize = 100 } = reqBody;
+        const { mode, email, weclappId } = reqBody;
+        const isAdmin = user.role === 'admin';
+        // Nicht-Admins: Party-ID immer serverseitig bestimmen, Client-Wert ignorieren
+        const partyId = isAdmin
+            ? (reqBody.partyId ? String(reqBody.partyId) : null)
+            : (mode === 'resolve' ? null : await getOwnPartyId(base44, user, subdomain, apiToken));
 
         // --- MODE: single customer by weclappId ---
         if (mode === 'customer' && weclappId) {
-            const data = await weclappFetch(subdomain, apiToken, `/customer/id/${weclappId}`);
+            const data = await weclappFetch(subdomain, apiToken, `/customer/id/${encodeURIComponent(String(weclappId))}`);
             const c = data;
+            if (!isAdmin && !isAssignedTo(c, partyId)) {
+                return Response.json({ error: 'Forbidden' }, { status: 403 });
+            }
             return Response.json({
                 success: true,
                 customer: {
@@ -63,6 +96,13 @@ Deno.serve(async (req) => {
         // --- MODE: resolve --- 
         // Given a user email, find the matching weclapp customer and return partyId
         if (mode === 'resolve') {
+            if (!isAdmin) {
+                // Nur die eigene E-Mail; Ergebnis wird serverseitig am Nutzer gespeichert
+                const own = await getOwnPartyId(base44, user, subdomain, apiToken);
+                return own
+                    ? Response.json({ success: true, partyId: own })
+                    : Response.json({ success: false, partyId: null, message: 'No weclapp customer found for this email' });
+            }
             const targetEmail = email || user.email;
             // Search by email in customer list
             const data = await weclappFetch(subdomain, apiToken,
@@ -83,8 +123,6 @@ Deno.serve(async (req) => {
 
         // --- MODE: customers (default) ---
         // Admins see all customers; regular users filtered by their partyId
-        const isAdmin = user.role === 'admin';
-
         if (!partyId && !isAdmin) {
             return Response.json({ success: false, error: 'No partyId provided and user is not admin' }, { status: 403 });
         }
@@ -104,15 +142,8 @@ Deno.serve(async (req) => {
 
         // Client-side filter by partyId if provided (for dealers or admin impersonation)
         if (partyId) {
-            const filtered = results.filter(c => {
-                const attr = (c.customAttributes || []).find(a => a.attributeDefinitionId === WECLAPP_ATTR_ID);
-                if (!attr) return false;
-                const refs = attr.entityReferences || [];
-                return refs.some(r => r.entityId === String(partyId));
-            });
-            // If no customers assigned to this partyId, fall back to showing all customers
-            // (handles cases where dealer exists in Weclapp but has no customer assignments yet)
-            results = filtered.length > 0 ? filtered : results;
+            // Strikt: nur zugeordnete Kunden (kein Fallback auf alle Kunden)
+            results = results.filter(c => isAssignedTo(c, partyId));
         }
 
         const customers = results.map(c => ({
@@ -146,6 +177,7 @@ Deno.serve(async (req) => {
         return Response.json({ success: true, count: customers.length, total: (data.result || []).length, customers });
 
     } catch (error) {
-        return Response.json({ error: error.message }, { status: 500 });
+        console.error('weclappProxy error', error?.message);
+        return Response.json({ error: 'Interner Fehler' }, { status: 500 });
     }
 });
