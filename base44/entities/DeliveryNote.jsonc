@@ -1,37 +1,18 @@
 {
   "name": "DeliveryNote",
-  "type": "object",
   "properties": {
-    "delivery_number": {
-      "type": "string",
-      "description": "Lieferscheinnummer"
-    },
-    "order_number": {
-      "type": "string"
-    },
-    "status": {
-      "type": "string",
-      "enum": [
-        "in_vorbereitung",
-        "versendet",
-        "zugestellt"
-      ],
-      "default": "in_vorbereitung"
-    },
-    "shipping_date": {
-      "type": "string",
-      "format": "date"
-    },
-    "tracking_number": {
-      "type": "string"
-    },
     "carrier": {
       "type": "string"
     },
+    "delivery_number": {
+      "description": "Lieferscheinnummer",
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
     "items": {
-      "type": "array",
       "items": {
-        "type": "object",
         "properties": {
           "description": {
             "type": "string"
@@ -39,14 +20,62 @@
           "quantity": {
             "type": "number"
           }
-        }
-      }
+        },
+        "type": "object"
+      },
+      "type": "array"
     },
-    "file_url": {
+    "order_number": {
+      "type": "string"
+    },
+    "shipping_date": {
+      "format": "date",
+      "type": "string"
+    },
+    "status": {
+      "default": "in_vorbereitung",
+      "enum": [
+        "in_vorbereitung",
+        "versendet",
+        "zugestellt"
+      ],
+      "type": "string"
+    },
+    "tracking_number": {
       "type": "string"
     }
   },
   "required": [
     "delivery_number"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
 }
