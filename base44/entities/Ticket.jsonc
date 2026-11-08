@@ -1,70 +1,120 @@
 {
   "name": "Ticket",
-  "type": "object",
   "properties": {
-    "ticket_number": {
-      "type": "string"
-    },
-    "subject": {
-      "type": "string"
-    },
-    "description": {
-      "type": "string"
-    },
-    "status": {
-      "type": "string",
-      "enum": [
-        "offen",
-        "in_bearbeitung",
-        "wartend",
-        "geschlossen"
-      ],
-      "default": "offen"
-    },
-    "priority": {
-      "type": "string",
-      "enum": [
-        "niedrig",
-        "mittel",
-        "hoch",
-        "kritisch"
-      ],
-      "default": "mittel"
-    },
     "category": {
-      "type": "string",
+      "default": "allgemein",
       "enum": [
         "technisch",
         "abrechnung",
         "allgemein",
         "produktanfrage"
       ],
-      "default": "allgemein"
+      "type": "string"
     },
     "comments": {
-      "type": "array",
       "items": {
-        "type": "object",
         "properties": {
           "author": {
             "type": "string"
           },
-          "message": {
-            "type": "string"
-          },
           "date": {
-            "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "type": "string"
           },
           "is_internal": {
             "type": "boolean"
+          },
+          "message": {
+            "type": "string"
           }
-        }
-      }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "description": {
+      "type": "string"
+    },
+    "priority": {
+      "default": "mittel",
+      "enum": [
+        "niedrig",
+        "mittel",
+        "hoch",
+        "kritisch"
+      ],
+      "type": "string"
+    },
+    "status": {
+      "default": "offen",
+      "enum": [
+        "offen",
+        "in_bearbeitung",
+        "wartend",
+        "geschlossen"
+      ],
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "ticket_number": {
+      "type": "string"
     }
   },
   "required": [
     "subject",
     "description"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "partner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  },
+  "type": "object"
 }
