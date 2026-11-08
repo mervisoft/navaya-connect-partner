@@ -1,58 +1,87 @@
 {
   "name": "Project",
-  "type": "object",
   "properties": {
-    "project_number": {
-      "type": "string"
-    },
-    "title": {
-      "type": "string"
-    },
     "description": {
       "type": "string"
     },
+    "end_date": {
+      "format": "date",
+      "type": "string"
+    },
+    "progress": {
+      "description": "Fortschritt in Prozent (0-100)",
+      "type": "number"
+    },
+    "project_number": {
+      "type": "string"
+    },
+    "start_date": {
+      "format": "date",
+      "type": "string"
+    },
     "status": {
-      "type": "string",
+      "default": "geplant",
       "enum": [
         "geplant",
         "aktiv",
         "pausiert",
         "abgeschlossen"
       ],
-      "default": "geplant"
-    },
-    "progress": {
-      "type": "number",
-      "description": "Fortschritt in Prozent (0-100)"
-    },
-    "start_date": {
-      "type": "string",
-      "format": "date"
-    },
-    "end_date": {
-      "type": "string",
-      "format": "date"
+      "type": "string"
     },
     "tasks": {
-      "type": "array",
       "items": {
-        "type": "object",
         "properties": {
-          "title": {
+          "due_date": {
+            "format": "date",
             "type": "string"
           },
           "status": {
             "type": "string"
           },
-          "due_date": {
-            "type": "string",
-            "format": "date"
+          "title": {
+            "type": "string"
           }
-        }
-      }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "title": {
+      "type": "string"
     }
   },
   "required": [
     "title"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
 }
