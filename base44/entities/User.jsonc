@@ -1,21 +1,35 @@
 {
   "name": "User",
-  "type": "object",
   "properties": {
     "role": {
-      "type": "string",
+      "default": "partner",
       "enum": [
         "admin",
         "partner"
       ],
-      "default": "partner"
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      },
+      "type": "string"
     },
     "weclapp_party_id": {
-      "type": "string",
-      "description": "Weclapp Party-ID des H\u00e4ndlers (wird automatisch per Email-Lookup gesetzt)"
+      "description": "Weclapp Party-ID des H\u00e4ndlers (wird automatisch per Email-Lookup gesetzt)",
+      "rls": {
+        "update": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      },
+      "type": "string"
     }
   },
   "required": [
     "weclapp_party_id"
-  ]
+  ],
+  "type": "object"
 }
