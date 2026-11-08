@@ -1,18 +1,18 @@
 {
   "name": "Product",
-  "type": "object",
   "properties": {
-    "product_number": {
-      "type": "string"
-    },
-    "name": {
-      "type": "string"
-    },
-    "description": {
+    "availability": {
+      "default": "Auf Lager",
+      "enum": [
+        "Auf Lager",
+        "2-3 Tage",
+        "1-2 Wochen",
+        "Auf Anfrage"
+      ],
       "type": "string"
     },
     "category": {
-      "type": "string",
+      "description": "Hauptkategorie",
       "enum": [
         "Software",
         "Hardware",
@@ -20,14 +20,44 @@
         "Services",
         "Zubeh\u00f6r"
       ],
-      "description": "Hauptkategorie"
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "featured": {
+      "default": false,
+      "type": "boolean"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "list_price": {
+      "description": "Listenpreis (UVP)",
+      "type": "number"
+    },
+    "manufacturer": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number"
     },
     "product_line": {
-      "type": "string",
-      "description": "Produktlinie / Hersteller-Produkt (z.B. BricsCAD, AutoCAD, Windows)"
+      "description": "Produktlinie / Hersteller-Produkt (z.B. BricsCAD, AutoCAD, Windows)",
+      "type": "string"
+    },
+    "product_number": {
+      "type": "string"
+    },
+    "stock": {
+      "default": 0,
+      "type": "number"
     },
     "subcategory": {
-      "type": "string",
+      "description": "Lizenztyp / Unterkategorie",
       "enum": [
         "Vollizenz",
         "Upgrade",
@@ -37,50 +67,56 @@
         "Bundle",
         "Sonstiges"
       ],
-      "description": "Lizenztyp / Unterkategorie"
+      "type": "string"
     },
     "upgrade_from_version": {
-      "type": "string",
-      "description": "Upgrade von Version (z.B. V22, V23) \u2013 nur f\u00fcr Upgrade-Produkte"
+      "description": "Upgrade von Version (z.B. V22, V23) \u2013 nur f\u00fcr Upgrade-Produkte",
+      "type": "string"
     },
     "upgrade_to_version": {
-      "type": "string",
-      "description": "Upgrade auf Version (z.B. V25) \u2013 nur f\u00fcr Upgrade-Produkte"
-    },
-    "manufacturer": {
+      "description": "Upgrade auf Version (z.B. V25) \u2013 nur f\u00fcr Upgrade-Produkte",
       "type": "string"
-    },
-    "price": {
-      "type": "number"
-    },
-    "list_price": {
-      "type": "number",
-      "description": "Listenpreis (UVP)"
-    },
-    "image_url": {
-      "type": "string"
-    },
-    "stock": {
-      "type": "number",
-      "default": 0
-    },
-    "availability": {
-      "type": "string",
-      "enum": [
-        "Auf Lager",
-        "2-3 Tage",
-        "1-2 Wochen",
-        "Auf Anfrage"
-      ],
-      "default": "Auf Lager"
-    },
-    "featured": {
-      "type": "boolean",
-      "default": false
     }
   },
   "required": [
     "name",
     "price"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "partner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
 }
