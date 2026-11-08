@@ -38,16 +38,13 @@ export function useWeclappParty() {
                     return;
                 }
 
-                // Resolve via email lookup
+                // Resolve via email lookup (server persists the partyId; field is admin-only)
                 const response = await base44.functions.invoke('weclappProxy', {
                     mode: 'resolve',
-                    email: user.email,
                 });
                 const result = response.data;
 
                 if (result?.success && result.partyId) {
-                    // Persist to user profile so we don't need to re-resolve next time
-                    await base44.auth.updateMe({ weclapp_party_id: result.partyId });
                     if (!cancelled) setPartyId(result.partyId);
                 } else {
                     if (!cancelled) setError('Kein Weclapp-Händler für diese E-Mail gefunden.');
