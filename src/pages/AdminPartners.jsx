@@ -52,7 +52,7 @@ export default function AdminPartners() {
     queryKey: ['allUsers'],
     queryFn: async () => {
       try {
-        return await base44.asServiceRole.entities.User.list();
+        return await base44.entities.User.list();
       } catch (e) {
         console.error('Error loading users:', e);
         return [];
