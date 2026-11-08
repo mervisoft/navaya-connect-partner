@@ -1,89 +1,118 @@
 {
   "name": "Contract",
-  "type": "object",
   "properties": {
+    "auto_renew": {
+      "default": true,
+      "type": "boolean"
+    },
+    "billing_cycle": {
+      "default": "monatlich",
+      "enum": [
+        "monatlich",
+        "viertelj\u00e4hrlich",
+        "j\u00e4hrlich"
+      ],
+      "type": "string"
+    },
     "contract_number": {
       "type": "string"
     },
-    "title": {
+    "edition": {
+      "description": "Edition (z.B. Pro, BIM, Lite)",
+      "type": "string"
+    },
+    "end_date": {
+      "format": "date",
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "monthly_amount": {
+      "type": "number"
+    },
+    "product_line": {
+      "description": "Produktlinie (z.B. BricsCAD)",
+      "type": "string"
+    },
+    "seats": {
+      "description": "Anzahl Lizenzen/Seats",
+      "type": "number"
+    },
+    "serial_numbers": {
+      "description": "Seriennummern der Lizenzen",
+      "items": {
+        "properties": {
+          "seat_name": {
+            "type": "string"
+          },
+          "serial": {
+            "type": "string"
+          },
+          "status": {
+            "default": "aktiv",
+            "enum": [
+              "aktiv",
+              "gesperrt",
+              "abgelaufen"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "start_date": {
+      "format": "date",
       "type": "string"
     },
     "status": {
-      "type": "string",
+      "default": "aktiv",
       "enum": [
         "aktiv",
         "gek\u00fcndigt",
         "ausgelaufen",
         "entwurf"
       ],
-      "default": "aktiv"
-    },
-    "start_date": {
-      "type": "string",
-      "format": "date"
-    },
-    "end_date": {
-      "type": "string",
-      "format": "date"
-    },
-    "monthly_amount": {
-      "type": "number"
-    },
-    "billing_cycle": {
-      "type": "string",
-      "enum": [
-        "monatlich",
-        "viertelj\u00e4hrlich",
-        "j\u00e4hrlich"
-      ],
-      "default": "monatlich"
-    },
-    "auto_renew": {
-      "type": "boolean",
-      "default": true
-    },
-    "file_url": {
       "type": "string"
     },
-    "product_line": {
-      "type": "string",
-      "description": "Produktlinie (z.B. BricsCAD)"
-    },
-    "edition": {
-      "type": "string",
-      "description": "Edition (z.B. Pro, BIM, Lite)"
-    },
-    "seats": {
-      "type": "number",
-      "description": "Anzahl Lizenzen/Seats"
-    },
-    "serial_numbers": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "serial": {
-            "type": "string"
-          },
-          "seat_name": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "aktiv",
-              "gesperrt",
-              "abgelaufen"
-            ],
-            "default": "aktiv"
-          }
-        }
-      },
-      "description": "Seriennummern der Lizenzen"
+    "title": {
+      "type": "string"
     }
   },
   "required": [
     "contract_number",
     "title"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
 }
