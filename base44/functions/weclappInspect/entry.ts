@@ -7,6 +7,10 @@ Deno.serve(async (req) => {
         if (!user) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
+        // Debug-Werkzeug mit freiem weclapp-Pfad: nur fuer Admins
+        if (user.role !== 'admin') {
+            return Response.json({ error: 'Forbidden' }, { status: 403 });
+        }
 
         const subdomain = Deno.env.get("WECLAPP_SUBDOMAIN");
         const apiToken = Deno.env.get("WECLAPP_API_TOKEN");
