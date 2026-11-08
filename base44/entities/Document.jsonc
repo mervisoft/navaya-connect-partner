@@ -1,12 +1,8 @@
 {
   "name": "Document",
-  "type": "object",
   "properties": {
-    "title": {
-      "type": "string"
-    },
     "category": {
-      "type": "string",
+      "default": "sonstiges",
       "enum": [
         "vertrag",
         "agb",
@@ -14,20 +10,60 @@
         "handbuch",
         "sonstiges"
       ],
-      "default": "sonstiges"
+      "type": "string"
     },
-    "file_url": {
+    "description": {
       "type": "string"
     },
     "file_size": {
       "type": "string"
     },
-    "description": {
+    "file_url": {
+      "type": "string"
+    },
+    "title": {
       "type": "string"
     }
   },
   "required": [
     "title",
     "file_url"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "partner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
 }
