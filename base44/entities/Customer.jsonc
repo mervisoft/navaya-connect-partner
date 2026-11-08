@@ -1,61 +1,111 @@
 {
   "name": "Customer",
-  "type": "object",
   "properties": {
-    "company_name": {
-      "type": "string",
-      "description": "Firmenname des Kunden"
-    },
-    "contact_person": {
-      "type": "string",
-      "description": "Ansprechpartner"
-    },
-    "email": {
-      "type": "string",
-      "format": "email"
-    },
-    "phone": {
-      "type": "string"
-    },
     "address": {
       "type": "string"
     },
     "city": {
       "type": "string"
     },
-    "postal_code": {
+    "company_name": {
+      "description": "Firmenname des Kunden",
+      "type": "string"
+    },
+    "contact_person": {
+      "description": "Ansprechpartner",
       "type": "string"
     },
     "country": {
-      "type": "string",
-      "default": "Deutschland"
-    },
-    "status": {
-      "type": "string",
-      "enum": [
-        "aktiv",
-        "inaktiv",
-        "potentiell"
-      ],
-      "default": "aktiv"
+      "default": "Deutschland",
+      "type": "string"
     },
     "customer_number": {
+      "type": "string"
+    },
+    "email": {
+      "format": "email",
+      "type": "string"
+    },
+    "last_order_date": {
+      "format": "date",
       "type": "string"
     },
     "notes": {
       "type": "string"
     },
-    "total_revenue": {
-      "type": "number",
-      "description": "Gesamtumsatz"
+    "phone": {
+      "type": "string"
     },
-    "last_order_date": {
-      "type": "string",
-      "format": "date"
+    "postal_code": {
+      "type": "string"
+    },
+    "status": {
+      "default": "aktiv",
+      "enum": [
+        "aktiv",
+        "inaktiv",
+        "potentiell"
+      ],
+      "type": "string"
+    },
+    "total_revenue": {
+      "description": "Gesamtumsatz",
+      "type": "number"
     }
   },
   "required": [
     "company_name",
     "email"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "partner"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  },
+  "type": "object"
 }
