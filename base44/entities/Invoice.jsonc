@@ -1,39 +1,47 @@
 {
   "name": "Invoice",
-  "type": "object",
   "properties": {
-    "invoice_number": {
-      "type": "string",
-      "description": "Rechnungsnummer"
-    },
-    "title": {
-      "type": "string"
-    },
-    "status": {
-      "type": "string",
-      "enum": [
-        "offen",
-        "bezahlt",
-        "\u00fcberf\u00e4llig",
-        "storniert"
-      ],
-      "default": "offen"
-    },
     "amount": {
       "type": "number"
     },
-    "invoice_date": {
-      "type": "string",
-      "format": "date"
+    "comments": {
+      "items": {
+        "properties": {
+          "author": {
+            "type": "string"
+          },
+          "date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "is_customer_comment": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
     },
     "due_date": {
-      "type": "string",
-      "format": "date"
+      "format": "date",
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "invoice_date": {
+      "format": "date",
+      "type": "string"
+    },
+    "invoice_number": {
+      "description": "Rechnungsnummer",
+      "type": "string"
     },
     "items": {
-      "type": "array",
       "items": {
-        "type": "object",
         "properties": {
           "description": {
             "type": "string"
@@ -41,43 +49,64 @@
           "quantity": {
             "type": "number"
           },
-          "unit_price": {
-            "type": "number"
-          },
           "total": {
             "type": "number"
+          },
+          "unit_price": {
+            "type": "number"
           }
-        }
-      }
+        },
+        "type": "object"
+      },
+      "type": "array"
     },
-    "file_url": {
+    "status": {
+      "default": "offen",
+      "enum": [
+        "offen",
+        "bezahlt",
+        "\u00fcberf\u00e4llig",
+        "storniert"
+      ],
       "type": "string"
     },
-    "comments": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "author": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "date": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "is_customer_comment": {
-            "type": "boolean"
-          }
-        }
-      }
+    "title": {
+      "type": "string"
     }
   },
   "required": [
     "invoice_number",
     "title",
     "amount"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
 }
