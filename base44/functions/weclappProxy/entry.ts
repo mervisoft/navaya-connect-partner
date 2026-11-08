@@ -20,8 +20,7 @@ function isAssignedTo(c, partyId) {
     if (!partyId) return false;
     const attr = (c.customAttributes || []).find(a => a.attributeDefinitionId === WECLAPP_ATTR_ID);
     if (!attr) return false;
-    return (attr.entityReferences || []).some(r => r.entityId === String(partyId))
-        || String(attr.selectedValueId || '') === String(partyId);
+    return (attr.entityReferences || []).some(r => r.entityId === String(partyId));
 }
 
 // Server-side ermittelte Party-ID des eingeloggten Nutzers (nie vom Client uebernommen).
